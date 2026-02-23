@@ -1,0 +1,25 @@
+# Render.com Deployment Configuration
+# This file helps automate deployment to Render.com
+
+services:
+  - type: web
+    name: anhs-eduportal-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false  # Set this manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true  # Auto-generate a secure secret
+      - key: CORS_ORIGIN
+        sync: false  # Set this to your Netlify URL after deployment
+      - key: UPLOAD_DIR
+        value: uploads
+      - key: PUBLIC_UPLOADS
+        value: "false"
+      - key: MAX_UPLOAD_SIZE_BYTES
+        value: "10485760"
