@@ -1,0 +1,632 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Tour - Aliaga National High School</title>
+    <link rel="stylesheet" href="darkmode.css">
+    <link rel="stylesheet" href="responsive.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="darkmode.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', Times, serif; /* Formal font */
+            background: linear-gradient(135deg, #176a3a 0%, #218c4a 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .tour-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tour-header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .tour-header h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tour-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #ffd600;
+            color: #176a3a;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: #ffe066;
+            transform: translateY(-2px);
+        }
+
+        .tour-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .tour-gallery {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .main-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .main-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.1);
+            border-color: #ffd600;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail.active {
+            border-color: #ffd600;
+            transform: scale(1.1);
+        }
+
+        .tour-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .location-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #ffd600;
+        }
+
+        .location-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .location-features {
+            margin-bottom: 30px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .feature-item i {
+            color: #ffd600;
+            font-size: 1.3rem;
+        }
+
+        .tour-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-button {
+            flex: 1;
+            background: #ffd600;
+            color: #176a3a;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .nav-button:hover {
+            background: #ffe066;
+            transform: translateY(-2px);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tour-progress {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .progress-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ffd600;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .vr-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ffd600;
+        }
+
+        .vr-button {
+            background: linear-gradient(135deg, #ffd600 0%, #ffed4e 100%);
+            color: #176a3a;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 32px rgba(255, 214, 0, 0.3);
+        }
+
+        .vr-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(255, 214, 0, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .tour-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .tour-header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .main-image {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tour-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .tour-header p {
+                font-size: 1.1rem;
+            }
+            
+            .main-image {
+                height: 300px;
+            }
+            
+            .thumbnail-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .location-title {
+                font-size: 1.8rem;
+            }
+            
+            .nav-button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tour-container {
+                padding: 15px;
+            }
+            
+            .tour-header {
+                padding: 30px 0;
+            }
+            
+            .tour-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-image {
+                height: 250px;
+            }
+            
+            .thumbnail {
+                height: 60px;
+            }
+            
+            .tour-controls {
+                flex-direction: column;
+            }
+            
+            .vr-button {
+                padding: 15px 30px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tour-gallery, .tour-info {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Loading state */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="site-header"></div>
+    <div class="tour-container">
+        <a href="main.html" class="back-button">
+            <i class="ri-arrow-left-line"></i>
+            Back to Home
+        </a>
+
+
+        <div class="tour-header">
+            <h1>Virtual Campus Tour</h1>
+            <p>Explore our state-of-the-art facilities and beautiful campus from the comfort of your home</p>
+        </div>
+
+        <div class="tour-content">
+            <div class="tour-gallery">
+                <div class="main-image">
+                    <img src="https://placehold.co/800x600" alt="Main entrance of Aliaga National High School with modern architecture and green spaces" id="mainTourImage">
+                </div>
+                <div class="thumbnail-grid" id="thumbnailGrid">
+                    <!-- Thumbnails will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="tour-info">
+                <h2 class="location-title" id="locationTitle">Main Entrance</h2>
+                <p class="location-description" id="locationDescription">
+                    Welcome to the main entrance of Aliaga National High School. Our modern architectural design reflects our commitment to providing a conducive learning environment for all students.
+                </p>
+                
+                <div class="location-features">
+                    <div class="feature-item">
+                        <i class="ri-building-2-line"></i>
+                        <span>Modern architectural design</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="ri-shield-check-line"></i>
+                        <span>24/7 security monitoring</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="ri-tree-line"></i>
+                        <span>Beautiful landscaping</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="ri-wheelchair-line"></i>
+                        <span>Fully accessible facilities</span>
+                    </div>
+                </div>
+
+                <div class="tour-controls">
+                    <button class="nav-button" id="prevButton" disabled>
+                        <i class="ri-arrow-left-line"></i>
+                        Previous
+                    </button>
+                    <button class="nav-button" id="nextButton">
+                        Next
+                        <i class="ri-arrow-right-line"></i>
+                    </button>
+                </div>
+
+                <div class="tour-progress">
+                    <div class="progress-text" id="progressText">1 of 8 locations</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+    </div>
+
+    <script>
+        // Tour data
+        const tourLocations = [
+            {
+                id: 1,
+                title: "Main Entrance",
+                description: "Welcome to the main entrance of Aliaga National High School. Our modern architectural design reflects our commitment to providing a conducive learning environment for all students.",
+                image: "https://placehold.co/800x600",
+                alt: "Main entrance of Aliaga National High School with modern architecture and green spaces",
+                features: [
+                    "24/7 security monitoring",
+                    "Beautiful landscaping",
+                    "Fully accessible facilities"
+                ]
+            },
+            {
+                id: 2,
+                title: "Science Laboratories",
+                description: "Our state-of-the-art science laboratories are equipped with modern equipment for physics, chemistry, and biology experiments. Students get hands-on experience with the latest technology.",
+                image: "https://placehold.co/800x600",
+                alt: "Modern science laboratory with equipment for physics, chemistry, and biology experiments",
+                features: [
+                    "Modern laboratory equipment",
+                ]
+            },
+            {
+                id: 3,
+                title: "Computer Lab & ICT Center",
+                description: "The ICT center features high-speed computers, programming workstations, and networking equipment. Perfect for our Special Program in Information and Communications Technology students.",
+                image: "https://placehold.co/800x600",
+                alt: "Computer laboratory with rows of modern computers and programming workstations",
+                features: [
+                    "High-speed computers",
+                    "Programming workstations",
+                    "Networking equipment",
+                    "Digital media tools"
+                ]
+            },
+            {
+                id: 4,
+                title: "Library & Learning Commons",
+                description: "Our extensive library collection includes thousands of books, digital resources, and quiet study areas. The perfect place for research and academic exploration.",
+                image: "https://placehold.co/800x600",
+                alt: "School library with bookshelves, study tables, and students reading",
+                features: [
+                    "Extensive book collection",
+                    "Quiet study areas",
+                ]
+            },
+            {
+                id: 5,
+                title: "Classrooms",
+                description: "Bright, spacious classrooms equipped with smart boards, comfortable seating, and excellent natural lighting. Designed to foster effective learning and collaboration.",
+                image: "https://placehold.co/800x600",
+                alt: "Modern classroom with smart board, student desks, and educational materials",
+                features: [
+                    "Comfortable seating",
+                    "Excellent lighting",
+                ]
+            },
+            {
+                id: 6,
+                title: "Sports Facilities",
+                description: "Our sports complex includes a basketball court, track field, and indoor gymnasium. We promote physical fitness and sportsmanship among our students.",
+                image: "https://placehold.co/800x600",
+                alt: "School basketball court and sports facilities with green surroundings",
+                features: [
+                    "2 Outdoor gymnasium",
+                    "Sports equipment"
+                ]
+            },
+            {
+                id: 7,
+                title: "Auditorium",
+                description: "The school auditorium hosts performances, assemblies, and special events. Equipped with professional sound and lighting systems for memorable experiences.",
+                image: "https://placehold.co/800x600",
+                alt: "School auditorium with stage, seating, and professional lighting",
+                features: [
+                    "Professional sound system",
+                ]
+            },
+            {
+                id: 8,
+                title: "Student Lounge",
+                description: "A comfortable space for students to relax, socialize, and collaborate on projects. Designed with modern furniture and charging stations.",
+                image: "https://placehold.co/800x600",
+                alt: "Student lounge area with comfortable seating and collaborative spaces",
+                features: [
+                    "Comfortable seating",
+                ]
+            }
+        ];
+
+        let currentLocationIndex = 0;
+
+        // Initialize the tour
+        function initializeTour() {
+            updateTourDisplay();
+            createThumbnails();
+            updateNavigation();
+        }
+
+        // Update the tour display
+        function updateTourDisplay() {
+            const location = tourLocations[currentLocationIndex];
+            
+            document.getElementById('mainTourImage').src = location.image;
+            document.getElementById('mainTourImage').alt = location.alt;
+            document.getElementById('locationTitle').textContent = location.title;
+            document.getElementById('locationDescription').textContent = location.description;
+            
+            // Update features
+            const featuresContainer = document.querySelector('.location-features');
+            featuresContainer.innerHTML = '';
+            
+            location.features.forEach(feature => {
+                const featureItem = document.createElement('div');
+                featureItem.className = 'feature-item';
+                featureItem.innerHTML = `
+                    <i class="ri-checkbox-circle-line"></i>
+                    <span>${feature}</span>
+                `;
+                featuresContainer.appendChild(featureItem);
+            });
+            
+            // Update progress
+            document.getElementById('progressText').textContent = `${currentLocationIndex + 1} of ${tourLocations.length} locations`;
+            document.getElementById('progressFill').style.width = `${((currentLocationIndex + 1) / tourLocations.length) * 100}%`;
+            
+            // Update active thumbnail
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumb, index) => {
+                thumb.classList.toggle('active', index === currentLocationIndex);
+            });
+        }
+
+        // Create thumbnails
+        function createThumbnails() {
+            const thumbnailGrid = document.getElementById('thumbnailGrid');
+            thumbnailGrid.innerHTML = '';
+            
+            tourLocations.forEach((location, index) => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+                thumbnail.innerHTML = `<img src="${location.image}" alt="${location.alt}">`;
+                thumbnail.onclick = () => {
+                    currentLocationIndex = index;
+                    updateTourDisplay();
+                    updateNavigation();
+                };
+                thumbnailGrid.appendChild(thumbnail);
+            });
+        }
+
+        // Update navigation buttons
+        function updateNavigation() {
+            document.getElementById('prevButton').disabled = currentLocationIndex === 0;
+            document.getElementById('nextButton').disabled = currentLocationIndex === tourLocations.length - 1;
+        }
+
+        // Navigation functions
+        function goToNext() {
+            if (currentLocationIndex < tourLocations.length - 1) {
+                currentLocationIndex++;
+                updateTourDisplay();
+                updateNavigation();
+            }
+        }
+
+        function goToPrev() {
+            if (currentLocationIndex > 0) {
+                currentLocationIndex--;
+                updateTourDisplay();
+                updateNavigation();
+            }
+        }
+
+        // VR Experience simulation
+        function startVRExperience() {
+            alert('VR Experience would launch here! This feature would provide a 360° immersive tour of our campus.');
+        }
+
+        // Event listeners
+        document.getElementById('nextButton').addEventListener('click', goToNext);
+        document.getElementById('prevButton').addEventListener('click', goToPrev);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                goToNext();
+            } else if (e.key === 'ArrowLeft') {
+                goToPrev();
+            }
+        });
+
+        // Initialize the tour when page loads
+        window.addEventListener('load', initializeTour);
+    </script>
+    <div id="site-footer"></div>
+</body>
+</html>

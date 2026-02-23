@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANHS EduPortal - Home</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Swiper for Carousels -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Dashboard Data Loader -->
+    <script src="js/dashboard.js"></script>
+    <link rel="icon" href="anhs-removebg-preview.png" type="image/png">
+
+
+    <style>
+        :root {
+            --primary-green: #1a6633;
+            --primary-green-light: #2d8b4a;
+            --primary-green-dark: #0d4a21;
+            --accent-yellow: #ffd700;
+            --accent-yellow-light: #f5edd6;
+            --accent-yellow-dark: #b88b2f;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-dark: #212529;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            line-height: 1.6;
+
+        }
+        
+        /* Header Styles */
+        .site-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+            color: var(--white);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            
+        }
+        
+        .site-header.scrolled {
+            padding: 10px 0;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(26, 102, 51, 0.95) 0%, rgba(13, 74, 33, 0.95) 100%);
+        }
+        
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: scale(1.02);
+        }
+        
+        .logo img {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-yellow);
+            background: var(--white);
+            padding: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        
+        .logo-text h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0;
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo-text p {
+            font-size: 14px;
+            color: var(--accent-yellow);
+            margin: 5px 0 0;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-link {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--accent-yellow);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::before {
+            width: 80%;
+        }
+        
+        .nav-link:hover {
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            background: var(--accent-yellow);
+            color: var(--primary-green);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .nav-link.active::before {
+            display: none;
+        }
+        
+        .nav-link.login {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-dark) 100%);
+            color: var(--primary-green);
+            font-weight: 700;
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+            to { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+        
+        .nav-link.login:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+        
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, 
+                rgba(26, 102, 51, 0.95) 0%, 
+                rgba(13, 74, 33, 0.95) 100%),
+                url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 120px 60px;
+            margin-bottom: 50px;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .hero-content h1 {
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 1s ease;
+        }
+        
+        .hero-content p {
+            font-size: 22px;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+        
+        .hero-stat {
+            text-align: center;
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .hero-stat::after {
+            content: '';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .hero-stat:last-child::after {
+            display: none;
+        }
+        
+        .hero-stat-number {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--accent-yellow);
+            margin-bottom: 5px;
+            display: block;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 50px;
+            animation: fadeInUp 1s ease 0.9s both;
+        }
+        
+        .cta-button {
+            padding: 18px 45px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        .cta-primary {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, #ffed4e 100%);
+            color: var(--primary-green);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.4);
+        }
+        
+        .cta-secondary {
+            background: transparent;
+            color: var(--white);
+            border: 3px solid var(--accent-yellow);
+            backdrop-filter: blur(10px);
+        }
+        
+        .cta-secondary:hover {
+            background: var(--accent-yellow);
+            color: var(--primary-green);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+        }
+        
+        /* Floating Particles */
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Stats Dashboard */
+        .stats-dashboard {
+            background: var(--white);
+            border-radius: 30px;
+            padding: 60px;
+            margin: -40px auto 80px;
+            max-width: 1200px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(26, 102, 51, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(26, 102, 51, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .stat-item:hover::before {
+            left: 100%;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-green);
+        }
+        
+        .stat-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: var(--white);
+            font-size: 32px;
+            box-shadow: 0 10px 20px rgba(26, 102, 51, 0.2);
+        }
+        
+        .stat-number {
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--primary-green);
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        /* Data Visualization */
+        .data-section {
+            padding: 80px 60px;
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--white) 100%);
+            margin-bottom: 60px;
+            border-radius: 30px;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 42px;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+            font-weight: 800;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--accent-yellow));
+            border-radius: 2px;
+        }
+        
+        .section-header p {
+            font-size: 18px;
+            color: var(--dark-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .chart-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--medium-gray);
+            transition: transform 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .chart-header h3 {
+            font-size: 22px;
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+        
+        .chart-wrapper {
+            height: 300px;
+            position: relative;
+        }
+        
+        /* Programs Showcase */
+        .programs-showcase {
+            padding: 80px 60px;
+            background: var(--white);
+            margin-bottom: 60px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+        
+        .programs-slider {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .swiper-container {
+            padding: 30px 10px;
+        }
+        
+        .program-card {
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+            border-radius: 25px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        .program-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary-green);
+            box-shadow: 0 25px 50px rgba(26, 102, 51, 0.15);
+        }
+        
+        .program-image {
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .program-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .program-card:hover .program-image img {
+            transform: scale(1.1);
+        }
+        
+        .program-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-dark) 100%);
+            color: var(--primary-green);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .program-content {
+            padding: 35px;
+        }
+        
+        .program-content h3 {
+            font-size: 24px;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .program-content p {
+            color: var(--dark-gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .program-features {
+            list-style: none;
+            margin-top: 25px;
+        }
+        
+        .program-features li {
+            padding: 10px 0;
+            color: var(--dark-gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .program-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .program-features li i {
+            color: var(--primary-green);
+            font-size: 18px;
+        }
+        
+        /* News Gallery */
+        .news-gallery {
+            padding: 80px 60px;
+            background: linear-gradient(135deg, rgba(26, 102, 51, 0.03) 0%, rgba(255, 215, 0, 0.03) 100%);
+            margin-bottom: 60px;
+            border-radius: 30px;
+        }
+        
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+        
+        .news-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .news-image {
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        
+        .news-card:hover .news-image img {
+            transform: scale(1.1);
+        }
+        
+        .news-category {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-dark) 100%);
+            color: var(--primary-green);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .news-content {
+            padding: 30px;
+            position: relative;
+        }
+        
+        .news-content h3 {
+            font-size: 20px;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        
+        .news-content p {
+            color: var(--dark-gray);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary-green-light);
+            font-size: 14px;
+            font-weight: 500;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Events Timeline */
+        .events-timeline {
+            padding: 80px 60px;
+            background: var(--white);
+            margin-bottom: 60px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+        
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 50px auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--primary-green), var(--accent-yellow));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 30px;
+            position: relative;
+            margin: 50px 0;
+            width: 50%;
+        }
+        
+        .timeline-item:nth-child(even) {
+            align-self: flex-end;
+            justify-content: flex-start;
+            padding-left: 30px;
+            padding-right: 0;
+            margin-left: 50%;
+        }
+        
+        .timeline-content {
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .timeline-content:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(26, 102, 51, 0.15);
+        }
+        
+        .timeline-date {
+            position: absolute;
+            top: -25px;
+            background: var(--primary-green);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(26, 102, 51, 0.3);
+        }
+        
+        .timeline-item:nth-child(even) .timeline-date {
+            right: -25px;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-date {
+            left: -25px;
+        }
+        
+        /* Interactive Map */
+        .campus-map {
+            padding: 80px 60px;
+            background: linear-gradient(135deg, rgba(26, 102, 51, 0.05) 0%, rgba(255, 215, 0, 0.05) 100%);
+            margin-bottom: 60px;
+            border-radius: 30px;
+        }
+        
+        .map-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-placeholder {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            height: 100%;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .map-placeholder i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        
+        .map-placeholder h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+            color: var(--white);
+            padding: 80px 0 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .site-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-yellow), var(--primary-green-light), var(--accent-yellow));
+        }
+        
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 22px;
+            margin-bottom: 30px;
+            color: var(--accent-yellow);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-yellow);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent-yellow);
+            transform: translateX(10px);
+        }
+        
+        .footer-contact p {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .social-link:hover {
+            background: var(--accent-yellow);
+            color: var(--primary-green);
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(26, 102, 51, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 15px 35px rgba(26, 102, 51, 0.4);
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-content h1 {
+                font-size: 48px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .header-container {
+                padding: 0 20px;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--accent-yellow);
+                color: var(--primary-green);
+                border: none;
+                width: 55px;
+                height: 55px;
+                border-radius: 12px;
+                font-size: 24px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                z-index: 1002;
+            }
+            
+            .mobile-menu-toggle:hover {
+                background: var(--accent-yellow-dark);
+                transform: rotate(90deg);
+            }
+            
+            .mobile-nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 100%;
+                max-width: 400px;
+                height: 100vh;
+                background: var(--white);
+                box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
+                padding: 100px 40px 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                z-index: 1001;
+                transition: right 0.4s ease;
+            }
+            
+            .mobile-nav.open {
+                right: 0;
+            }
+            
+            .mobile-nav .nav-link {
+                color: var(--text-dark);
+                padding: 20px;
+                border-radius: 15px;
+                background: var(--light-gray);
+            }
+            
+            .mobile-nav .nav-link:hover {
+                background: var(--primary-green);
+                color: var(--white);
+            }
+            
+            .mobile-nav .nav-link.login {
+                background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-dark) 100%);
+                color: var(--primary-green);
+                margin-top: 20px;
+            }
+            
+            .mobile-nav-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(5px);
+                z-index: 1000;
+                display: none;
+            }
+            
+            .mobile-nav-overlay.open {
+                display: block;
+            }
+            
+            .main-content {
+                padding: 0;
+            }
+            
+            .hero-section {
+                padding: 80px 30px;
+            }
+            
+            .stats-dashboard,
+            .data-section,
+            .programs-showcase,
+            .news-gallery,
+            .events-timeline,
+            .campus-map {
+                padding: 60px 30px;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+            
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 0;
+            }
+            
+            .timeline-item:nth-child(even) {
+                margin-left: 0;
+                padding-left: 70px;
+            }
+            
+            .timeline-date {
+                left: -50px !important;
+                right: auto !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 36px;
+            }
+            
+            .hero-content p {
+                font-size: 18px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cta-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .hero-stat::after {
+                display: none;
+            }
+            
+            .section-header h2 {
+                font-size: 32px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo-text h1 {
+                font-size: 24px;
+            }
+            
+            .logo img {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .hero-section {
+                padding: 60px 20px;
+            }
+            
+            .stats-dashboard,
+            .data-section,
+            .programs-showcase,
+            .news-gallery,
+            .events-timeline,
+            .campus-map {
+                padding: 40px 20px;
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+            
+            .chart-container {
+                padding: 25px;
+            }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 6px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-light) 100%);
+            border-radius: 6px;
+            border: 3px solid var(--light-gray);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, var(--primary-green-dark) 0%, var(--primary-green) 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="site-header" id="siteHeader">
+        <div class="header-container">
+            <div class="logo">
+                <img src="anhs-removebg-preview.png" alt="ANHS Logo">
+                <div class="logo-text">
+                    <h1>Aliaga National High School</h1>
+                    <p>Excellence in Education Since 1995 | DepEd Region III</p>
+                </div>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="nav-menu">
+                <button class="nav-link active" onclick="navigateTo('home')">
+                    <i class="bi bi-house-door"></i>
+                    <span>Home</span>
+                </button>
+                <button class="nav-link" onclick="navigateTo('about')">
+                    <i class="bi bi-info-circle"></i>
+                    <span>About</span>
+                </button>
+                <button class="nav-link" onclick="navigateTo('programs')">
+                    <i class="bi bi-book"></i>
+                    <span>Programs</span>
+                </button>
+                <button class="nav-link" onclick="navigateTo('admissions')">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Admissions</span>
+                </button>
+                <button class="nav-link" onclick="navigateTo('news')">
+                    <i class="bi bi-newspaper"></i>
+                    <span>News</span>
+                </button>
+                <button class="nav-link" onclick="navigateTo('contact')">
+                    <i class="bi bi-envelope"></i>
+                    <span>Contact</span>
+                </button>
+                <button class="nav-link login" onclick="navigateTo('login')">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Portal Login</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="floating-particles" id="particles"></div>
+            <div class="hero-content">
+                <h1 data-aos="fade-down">Excellence in Public Education</h1>
+                <p data-aos="fade-up" data-aos-delay="200">A DepEd-accredited national high school providing quality secondary education to the youth of Aliaga, Nueva Ecija since 1995.</p>
+                
+                <div class="cta-buttons" data-aos="fade-up" data-aos-delay="400">
+                    <a href="#" class="cta-button cta-primary" onclick="navigateTo('admissions')">
+                        <i class="bi bi-person-plus"></i>
+                        Enroll Now
+                    </a>
+                    <a href="#" class="cta-button cta-secondary" onclick="navigateTo('virtual-tour')">
+                        <i class="bi bi-camera-video"></i>
+                        Explore Campus
+                    </a>
+                </div>
+                
+                <div class="hero-stats" data-aos="fade-up" data-aos-delay="600">
+                    <div class="hero-stat">
+                        <span class="hero-stat-number" id="stat-students">2,500+</span>
+                        <span class="hero-stat-label">Students</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-number" id="stat-graduation">98%</span>
+                        <span class="hero-stat-label">Graduation Rate</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-number" id="stat-faculty">150+</span>
+                        <span class="hero-stat-label">Expert Faculty</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-number" id="stat-programs">25+</span>
+                        <span class="hero-stat-label">Programs</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Stats Dashboard -->
+        <div class="stats-dashboard" data-aos="fade-up">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-trophy"></i>
+                    </div>
+                    <span class="stat-number" id="dashboard-students">0</span>
+                    <span class="stat-label">Total Students</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+                    <span class="stat-number" id="dashboard-teachers">0</span>
+                    <span class="stat-label">Expert Teachers</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <span class="stat-number" id="dashboard-programs">0</span>
+                    <span class="stat-label">Programs Offered</span>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <span class="stat-number" id="dashboard-awards">0</span>
+                    <span class="stat-label">News & Updates</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Data Visualization Section -->
+        <section class="data-section">
+            <div class="section-header" data-aos="fade-up">
+                <h2>School Performance</h2>
+                <p>Track our academic achievements and student progress metrics</p>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-container" data-aos="fade-right">
+                    <div class="chart-header">
+                        <h3>Academic Performance Trends</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container" data-aos="fade-left">
+                    <div class="chart-header">
+                        <h3>Student Distribution by Grade Level</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="programDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                
+                <div class="chart-container" data-aos="fade-right">
+                    <div class="chart-header">
+                        <h3>University Placement</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="placementChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-container" data-aos="fade-left">
+                    <div class="chart-header">
+                        <h3>Student Satisfaction Survey</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="satisfactionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Programs Showcase -->
+        <section class="programs-showcase">
+            <div class="section-header" data-aos="fade-up">
+                <h2>Junior High School Programs</h2>
+                <p>Quality education for Grades 7-10 aligned with DepEd K-12 standards</p>
+            </div>
+            
+            <div class="programs-slider" data-aos="fade-up">
+                <div class="swiper-container">
+                    <div class="swiper-wrapper" id="programs-container">
+                        <!-- Programs will be loaded dynamically from API -->
+                        <div class="swiper-slide">
+                            <div class="program-card">
+                                <div class="program-image">
+                                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="Loading">
+                                    <div class="program-badge">...</div>
+                                </div>
+                                <div class="program-content">
+                                    <h3>Loading Programs...</h3>
+                                    <p>Please wait while we fetch the latest programs from our database.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- News Gallery -->
+        <section class="news-gallery">
+            <div class="section-header" data-aos="fade-up">
+                <h2>Latest News & Updates</h2>
+                <p>Stay informed about school events, achievements, and announcements</p>
+            </div>
+            
+            <div class="news-grid" id="news-container">
+                <!-- News will be loaded dynamically from API -->
+                <div class="news-card" data-aos="fade-up">
+                    <div class="news-content">
+                        <h3>Loading News...</h3>
+                        <p>Please wait while we fetch the latest news from our database.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Events Timeline -->
+        <section class="events-timeline">
+            <div class="section-header" data-aos="fade-up">
+                <h2>School Events Calendar</h2>
+                <p>Important school activities and DepEd-mandated events</p>
+            </div>
+            
+            <div class="timeline" id="events-container">
+                <!-- Events will be loaded dynamically from API -->
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-content">
+                        <h3>Loading Events...</h3>
+                        <p>Please wait while we fetch upcoming events from our database.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Interactive Campus Map -->
+        <section class="campus-map">
+            <div class="section-header" data-aos="fade-up">
+                <h2>Our Campus</h2>
+                <p>Located in Brgy. Poblacion East, Aliaga, Nueva Ecija</p>
+            </div>
+            
+            <div class="map-container" data-aos="fade-up">
+                <div class="map-placeholder">
+                    <i class="bi bi-geo-alt"></i>
+                    <h3>Campus Location</h3>
+                    <p>Brgy. Poblacion East, Aliaga, Nueva Ecija, 3111</p>
+                    <p>Region III - Central Luzon | Division of Nueva Ecija</p>
+                    <div style="margin-top: 30px;">
+                        <button class="cta-button cta-primary" onclick="navigateTo('virtual-tour')" style="padding: 15px 30px;">
+                            <i class="bi bi-map"></i>
+                            View Campus Layout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Aliaga National High School</h3>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px; line-height: 1.6;">A DepEd-accredited public secondary school providing quality education to the youth of Aliaga, Nueva Ecija since 1995.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="bi bi-envelope"></i></a>
+                        <a href="#" class="social-link"><i class="bi bi-telephone"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="navigateTo('home')"><i class="bi bi-chevron-right"></i> Home</a></li>
+                        <li><a href="#" onclick="navigateTo('about')"><i class="bi bi-chevron-right"></i> About ANHS</a></li>
+                        <li><a href="#" onclick="navigateTo('programs')"><i class="bi bi-chevron-right"></i> Academic Programs</a></li>
+                        <li><a href="#" onclick="navigateTo('admissions')"><i class="bi bi-chevron-right"></i> Enrollment</a></li>
+                        <li><a href="#" onclick="navigateTo('news')"><i class="bi bi-chevron-right"></i> News & Events</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contact Information</h3>
+                    <div class="footer-contact">
+                        <p><i class="bi bi-geo-alt"></i> Brgy. Poblacion East, Aliaga, Nueva Ecija 3111</p>
+                        <p><i class="bi bi-telephone"></i> School ID: 300617</p>
+                        <p><i class="bi bi-envelope"></i> DepEd Region III - Nueva Ecija Division</p>
+                        <p><i class="bi bi-clock"></i> Office Hours: 7:30 AM - 5:00 PM</p>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Quick Access</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="navigateTo('login')"><i class="bi bi-chevron-right"></i> Student Portal</a></li>
+                        <li><a href="#" onclick="navigateTo('login')"><i class="bi bi-chevron-right"></i> Faculty Portal</a></li>
+                        <li><a href="#" onclick="navigateTo('login')"><i class="bi bi-chevron-right"></i> Parent Portal</a></li>
+                        <li><a href="#" onclick="navigateTo('virtual-tour')"><i class="bi bi-chevron-right"></i> Campus Virtual Tour</a></li>
+                        <li><a href="https://depednuevaecija.ph" target="_blank"><i class="bi bi-chevron-right"></i> DepEd Nueva Ecija</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Aliaga National High School. All rights reserved. | <a href="#" style="color: var(--accent-yellow); text-decoration: none;">DepEd Compliance</a> | <a href="#" style="color: var(--accent-yellow); text-decoration: none;">Transparency Seal</a> | <a href="#" style="color: var(--accent-yellow); text-decoration: none;">Accessibility</a></p>
+                <p style="margin-top: 10px; font-size: 12px;">Official Public Secondary School of Aliaga, Nueva Ecija</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="bi bi-arrow-up"></i>
+    </a>
+
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Initialize Swiper
+        const swiper = new Swiper('.swiper-container', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            loop: true,
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true,
+            },
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                768: {
+                    slidesPerView: 2,
+                },
+                1024: {
+                    slidesPerView: 3,
+                }
+            }
+        });
+
+        // Navigation function
+        function navigateTo(page) {
+            switch(page) {
+                case 'home':
+                    window.location.href = 'main.html';
+                    break;
+                case 'about':
+                    window.location.href = 'about us.html';
+                    break;
+                case 'programs':
+                    window.location.href = 'Programs.html';
+                    break;
+                case 'admissions':
+                    window.location.href = 'admission.html';
+                    break;
+                case 'news':
+                    window.location.href = 'news.html';
+                    break;
+                case 'contact':
+                    window.location.href = 'contact.html';
+                    break;
+                case 'virtual-tour':
+                    window.location.href = 'virtual tour.html';
+                    break;
+                case 'login':
+                    window.location.href = 'login.html';
+                    break;
+                default:
+                    console.log('Navigation to:', page);
+            }
+        }
+
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+
+            const particleCount = 20;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // Random properties
+                const size = Math.random() * 10 + 5;
+                const left = Math.random() * 100;
+                const animationDelay = Math.random() * 15;
+                const animationDuration = Math.random() * 20 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${left}%`;
+                particle.style.animationDelay = `${animationDelay}s`;
+                particle.style.animationDuration = `${animationDuration}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Header scroll effect
+        function handleHeaderScroll() {
+            const header = document.getElementById('siteHeader');
+            const backToTop = document.getElementById('backToTop');
+            
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+                backToTop.classList.add('visible');
+            } else {
+                header.classList.remove('scrolled');
+                backToTop.classList.remove('visible');
+            }
+        }
+
+        // Initialize charts - will be populated with API data
+        function initializeCharts() {
+
+            // Performance Chart - based on typical public school trends
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'NAT Average Score',
+                        data: [85, 87, 88, 89, 91],
+                        borderColor: '#1a6633',
+                        backgroundColor: 'rgba(26, 102, 51, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                    }, {
+                        label: 'Graduation Rate %',
+                        data: [95, 96, 97, 97, 98],
+                        borderColor: '#ffd700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 80,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Program Distribution Chart - JHS Grade Level Distribution
+            const programCtx = document.getElementById('programDistributionChart').getContext('2d');
+            new Chart(programCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
+                    datasets: [{
+                        data: [28, 26, 24, 22],
+                        backgroundColor: [
+                            '#1a6633',
+                            '#2d8b4a',
+                            '#ffd700',
+                            '#b88b2f'
+                        ],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+
+
+            // Placement Chart - Post-Graduation Pathways
+            const placementCtx = document.getElementById('placementChart').getContext('2d');
+            new Chart(placementCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['College', 'TESDA', 'Employment', 'Entrepreneurship', 'Other'],
+                    datasets: [{
+                        label: 'Graduates',
+                        data: [70, 15, 5, 5, 5],
+                        backgroundColor: '#1a6633',
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 80,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Satisfaction Chart - School Services
+            const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
+            new Chart(satisfactionCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Teaching Quality', 'Facilities', 'Guidance', 'Activities', 'Administration', 'Safety'],
+                    datasets: [{
+                        label: 'Parent/Student Satisfaction',
+                        data: [92, 85, 90, 88, 86, 94],
+                        backgroundColor: 'rgba(26, 102, 51, 0.2)',
+                        borderColor: '#1a6633',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1a6633',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('ANHS Public Portal loaded');
+            
+            // Create floating particles
+            createParticles();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up scroll event
+            window.addEventListener('scroll', handleHeaderScroll);
+            handleHeaderScroll(); // Initial call
+            
+            // Back to top functionality
+            document.getElementById('backToTop').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Add loading animation
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 500);
+            
+            // Load dashboard data from API
+            if (window.Dashboard) {
+                window.Dashboard.initialize();
+            }
+        });
+
+
+        // Add loading style
+        const style = document.createElement('style');
+        style.textContent = `
+            body.loaded {
+                animation: fadeIn 1s ease;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
