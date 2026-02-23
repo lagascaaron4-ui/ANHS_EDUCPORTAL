@@ -1,0 +1,34 @@
+# Netlify Deployment Configuration
+# This file configures the frontend deployment on Netlify
+
+[build]
+  # No build command needed for static HTML/CSS/JS
+  publish = "."
+
+[[redirects]]
+  # Redirect all routes to index.html for SPA behavior (if needed)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  condition = {Path = {eq = "/"}}
+
+[[redirects]]
+  # Handle clean URLs (remove .html extension)
+  from = "/:page"
+  to = "/:page.html"
+  status = 200
+
+[[headers]]
+  # Security headers
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  # CORS headers for API communication
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"

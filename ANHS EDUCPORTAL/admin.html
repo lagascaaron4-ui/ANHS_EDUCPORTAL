@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Aliaga National High School</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/api.js"></script>
+    <style>
+        :root {
+            --primary-color: #0f4b2b;
+            --secondary-color: #b88b2f;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: linear-gradient(135deg, var(--primary-color), #176a3a);
+            color: white;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .school-logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+        
+        .nav-menu {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            list-style: none;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .nav-badge {
+            margin-left: auto;
+            background: var(--secondary-color);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        .top-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .page-title i {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .btn-primary-custom {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary-custom:hover {
+            background: #0a3a1f;
+            transform: translateY(-2px);
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .stat-card:nth-child(2) { border-color: #4facfe; }
+        .stat-card:nth-child(3) { border-color: #ff6b6b; }
+        .stat-card:nth-child(4) { border-color: #51cf66; }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(15, 75, 43, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Tables */
+        .data-table-wrapper {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            background: #f8f9fa;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-icon:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 25px 25px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 999;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                width: 50px;
+                height: 50px;
+                border-radius: 8px;
+                font-size: 20px;
+            }
+        }
+        
+        /* Quick Actions */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .quick-action {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .quick-action:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            color: var(--primary-color);
+        }
+        
+        .quick-action i {
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .section-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Toggle for Mobile -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="school-logo">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <h3>Aliaga NHS</h3>
+            <p>Administration Panel</p>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                    <span class="nav-badge">New</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#students" class="nav-link" data-section="students">
+                    <i class="bi bi-people-fill"></i>
+                    <span>Students</span>
+                    <span class="nav-badge">1,245</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#teachers" class="nav-link" data-section="teachers">
+                    <i class="bi bi-person-badge-fill"></i>
+                    <span>Teachers</span>
+                    <span class="nav-badge">48</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#enrollments" class="nav-link" data-section="enrollments">
+                    <i class="bi bi-clipboard-check-fill"></i>
+                    <span>Enrollments</span>
+                    <span class="nav-badge">23</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#announcements" class="nav-link" data-section="announcements">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <span>Announcements</span>
+                    <span class="nav-badge">15</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#parent-messages" class="nav-link" data-section="parent-messages">
+                    <i class="bi bi-chat-left-text-fill"></i>
+                    <span>Parent Messages</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#reports" class="nav-link" data-section="reports">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Reports</span>
+                    <span class="nav-badge">8</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#users" class="nav-link" data-section="users">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Admin Users</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#settings" class="nav-link" data-section="settings">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer" style="position: absolute; bottom: 20px; left: 0; right: 0; padding: 20px;">
+            <div class="user-info" style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 40px; height: 40px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 500;">Admin User</div>
+                    <small>System Administrator</small>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="page-title">
+                <i class="bi bi-speedometer2"></i>
+                <div>
+                    <h1 style="margin: 0; color: var(--primary-color);">Dashboard Overview</h1>
+                    <small style="color: #666;">Welcome back, Admin!</small>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="globalSearch" placeholder="Search students, teachers, files...">
+                </div>
+                <button class="btn-icon" id="notificationBtn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <button class="btn-primary-custom" id="exportDataBtn">
+                    <i class="bi bi-download"></i>
+                    <span>Export Data</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-value" id="totalStudentsValue">1,245</div>
+                    <div class="stat-label">Total Students</div>
+                    <div style="color: #51cf66; font-size: 14px;">
+                        <i class="bi bi-arrow-up"></i> 12% increase
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+                    <div class="stat-value" id="totalTeachersValue">48</div>
+                    <div class="stat-label">Teaching Staff</div>
+                    <div style="color: #4facfe; font-size: 14px;">
+                        <i class="bi bi-plus-circle"></i> 2 new hires
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-clipboard-check-fill"></i>
+                    </div>
+                    <div class="stat-value" id="pendingEnrollmentsValue">23</div>
+                    <div class="stat-label">Pending Enrollments</div>
+                    <div style="color: #ff6b6b; font-size: 14px;">
+                        <i class="bi bi-exclamation-triangle"></i> Needs review
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <div class="stat-value" id="upcomingEventsValue">8</div>
+                    <div class="stat-label">Upcoming Events</div>
+                    <div style="color: #ff922b; font-size: 14px;">
+                        <i class="bi bi-clock"></i> This week
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-header">
+                <h2><i class="bi bi-lightning-fill"></i> Quick Actions</h2>
+                <small style="color: #666;">Common administrative tasks</small>
+            </div>
+            
+            <div class="quick-actions-grid">
+                <a href="#" class="quick-action" id="quickAddStudent">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Add Student</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Register a new student</p>
+                    </div>
+                </a>
+                <a href="#" class="quick-action" id="quickInviteTeacher">
+                    <i class="bi bi-envelope-plus-fill"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Invite Teacher</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Send teacher invitation</p>
+                    </div>
+                </a>
+                <a href="#" class="quick-action" id="quickCreateAnnouncement">
+                    <i class="bi bi-megaphone-fill"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Create Announcement</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">School-wide updates</p>
+                    </div>
+                </a>
+                <a href="#" class="quick-action" id="quickInviteAdmin">
+                    <i class="bi bi-shield-plus"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Invite Admin</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Add system administrator</p>
+                    </div>
+                </a>
+                <a href="#" class="quick-action" id="quickCreateAssignment">
+                    <i class="bi bi-journal-text"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Create Assignment</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Post student work</p>
+                    </div>
+                </a>
+                <a href="#" class="quick-action" id="quickCreateSchedule">
+                    <i class="bi bi-calendar2-week"></i>
+                    <div>
+                        <h4 style="margin-bottom: 5px;">Add Schedule</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Class schedule entry</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="section-header" style="margin-top: 30px;">
+                <h2><i class="bi bi-journal-text"></i> Assignments</h2>
+                <small style="color: #666;">Manage student assignments</small>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="assignmentsTable">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                            <th>Section</th>
+                            <th>Due Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignmentsTableBody">
+                        <tr><td colspan="6">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-header" style="margin-top: 30px;">
+                <h2><i class="bi bi-calendar2-week"></i> Schedule</h2>
+                <small style="color: #666;">Manage class schedule</small>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover" id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                            <th>Section</th>
+                            <th>Day</th>
+                            <th>Time</th>
+                            <th>Room</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <tr><td colspan="7">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Charts -->
+            <div class="section-header">
+                <h2><i class="bi bi-bar-chart-fill"></i> Enrollment Statistics</h2>
+            </div>
+            
+            <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <canvas id="enrollmentChart" height="250"></canvas>
+            </div>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-people-fill"></i> Student Management</h2>
+                <button class="btn-primary-custom" id="addStudentBtn">
+                    <i class="bi bi-plus-lg"></i>
+                    <span>Add Student</span>
+                </button>
+            </div>
+            
+            <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: center;">
+                <div class="search-box" style="flex: 1;">
+                    <i class="bi bi-search"></i>
+                    <input type="text" id="studentSearch" placeholder="Search students by name, ID, or grade...">
+                </div>
+                <select class="form-control" style="width: 200px;">
+                    <option>All Grades</option>
+                    <option>Grade 7</option>
+                    <option>Grade 8</option>
+                    <option>Grade 9</option>
+                    <option>Grade 10</option>
+                </select>
+
+            </div>
+            
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Full Name</th>
+                            <th>Grade Level</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>STU-2024-001</td>
+                            <td>Juan Dela Cruz</td>
+                            <td>Grade 10</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>STU-2024-002</td>
+                            <td>Maria Santos</td>
+                            <td>Grade 9</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn-icon" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Teachers Section -->
+        <section id="teachers" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-person-badge-fill"></i> Teacher Management</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary-custom" id="inviteTeacherBtn">
+                        <i class="bi bi-envelope-plus"></i>
+                        <span>Invite Teacher</span>
+                    </button>
+                    <button class="btn-primary-custom" id="addTeacherBtn">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Teacher</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="search-box" style="margin-bottom: 20px;">
+                <i class="bi bi-search"></i>
+                <input type="text" id="teacherSearch" placeholder="Search teachers by name, subject, or ID...">
+            </div>
+            
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Teacher ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teachersTableBody">
+                        <tr>
+                            <td colspan="6">Loading teachers...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-shield-check"></i> Admin Users Management</h2>
+                <button class="btn-primary-custom" id="inviteAdminBtn">
+                    <i class="bi bi-shield-plus"></i>
+                    <span>Invite Admin</span>
+                </button>
+            </div>
+            
+            <!-- Active Invitation Link -->
+            <div style="background: #e9f5ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4facfe;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>Active Invitation Link:</strong>
+                        <div style="font-family: monospace; background: white; padding: 8px; border-radius: 4px; margin-top: 5px; font-size: 12px;">
+                            https://alianhs.edu.ph/admin/register?invite=ADM-2024-001&token=xyz123abc456
+                        </div>
+                    </div>
+                    <button class="btn-icon" id="copyInviteLinkBtn">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr>
+                            <td colspan="6">Loading admin users...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Other Sections -->
+        <section id="enrollments" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-clipboard-check-fill"></i> Enrollment Management</h2>
+                <small>Manage student enrollments and applications</small>
+            </div>
+            <p style="text-align: center; padding: 40px; color: #666;">Enrollment management content will appear here</p>
+        </section>
+
+        <section id="announcements" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-megaphone-fill"></i> Announcements</h2>
+                <small>Create and manage school announcements</small>
+            </div>
+            <p style="text-align: center; padding: 40px; color: #666;">Announcements content will appear here</p>
+        </section>
+
+        <section id="parent-messages" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-chat-left-text-fill"></i> Parent Messages</h2>
+                <small>Review parent messages and send replies</small>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <button class="btn-primary-custom" id="refreshParentMessagesBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Parent</th>
+                            <th>Direction</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="parentMessagesTableBody">
+                        <tr><td colspan="6">Open this section to load parent messages.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="reports" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-graph-up"></i> Reports & Analytics</h2>
+                <small>Generate and view school reports</small>
+            </div>
+            <p style="text-align: center; padding: 40px; color: #666;">Reports content will appear here</p>
+        </section>
+
+        <section id="settings" class="content-section">
+            <div class="section-header">
+                <h2><i class="bi bi-gear-fill"></i> System Settings</h2>
+                <small>Configure system preferences and options</small>
+            </div>
+            <p style="text-align: center; padding: 40px; color: #666;">Settings content will appear here</p>
+        </section>
+
+    </main>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-person-plus"></i> Add New Student</h2>
+                <button class="btn-icon" onclick="closeModal('studentModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="studentForm">
+                    <div class="form-group">
+                        <label for="studentName">Full Name</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Enter student's full name" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="gradeLevel">Grade Level</label>
+                            <select id="gradeLevel" class="form-control" required>
+                                <option value="">Select Grade Level</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                            </select>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="birthDate">Date of Birth</label>
+                            <input type="date" id="birthDate" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contactInfo">Contact Information</label>
+                        <input type="text" id="contactInfo" class="form-control" placeholder="Phone number or email" required>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button type="button" class="btn-icon" onclick="closeModal('studentModal')">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Save Student</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="inviteTeacherModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-envelope-plus"></i> Invite Teacher</h2>
+                <button class="btn-icon" onclick="closeModal('inviteTeacherModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="inviteTeacherForm">
+                    <div class="form-group">
+                        <label for="teacherName">Teacher's Full Name</label>
+                        <input type="text" id="teacherName" class="form-control" placeholder="Enter teacher's full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacherEmail">Email Address</label>
+                        <input type="email" id="teacherEmail" class="form-control" placeholder="Enter teacher email" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="teacherSubject">Subject</label>
+                            <select id="teacherSubject" class="form-control" required>
+                                <option value="">Select Subject</option>
+                                <option value="mathematics">Mathematics</option>
+                                <option value="science">Science</option>
+                                <option value="english">English</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacherGrade">Grade Level</label>
+                            <select id="teacherGrade" class="form-control" required>
+                                <option value="">All Levels</option>
+                                <option value="7-10">Grade 7-10</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button type="button" class="btn-icon" onclick="closeModal('inviteTeacherModal')">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-send"></i>
+                            <span>Send Invitation</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="inviteAdminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-shield-plus"></i> Invite Admin User</h2>
+                <button class="btn-icon" onclick="closeModal('inviteAdminModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="inviteAdminForm">
+                    <div class="form-group">
+                        <label for="adminName">Full Name</label>
+                        <input type="text" id="adminName" class="form-control" placeholder="Enter admin's full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminEmail">Email Address</label>
+                        <input type="email" id="adminEmail" class="form-control" placeholder="Enter admin email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminRole">Role</label>
+                        <select id="adminRole" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="super-admin">Super Administrator</option>
+                            <option value="principal">Principal</option>
+                            <option value="registrar">Registrar</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button type="button" class="btn-icon" onclick="closeModal('inviteAdminModal')">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-send"></i>
+                            <span>Generate Invitation</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="assignmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-journal-text"></i> Create Assignment</h2>
+                <button class="btn-icon" onclick="closeModal('assignmentModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="assignmentForm">
+                    <div class="form-group">
+                        <label for="assignmentTitle">Title</label>
+                        <input type="text" id="assignmentTitle" class="form-control" placeholder="Assignment title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignmentSubject">Subject</label>
+                        <input type="text" id="assignmentSubject" class="form-control" placeholder="Subject" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="assignmentGrade">Grade Level</label>
+                            <select id="assignmentGrade" class="form-control" required>
+                                <option value="">Select Grade</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="assignmentSection">Section (Optional)</label>
+                            <input type="text" id="assignmentSection" class="form-control" placeholder="A">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignmentDueDate">Due Date</label>
+                        <input type="date" id="assignmentDueDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignmentDescription">Description</label>
+                        <textarea id="assignmentDescription" class="form-control" rows="3" placeholder="Details..."></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button type="button" class="btn-icon" onclick="closeModal('assignmentModal')">Cancel</button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Create</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-calendar2-week"></i> Add Schedule</h2>
+                <button class="btn-icon" onclick="closeModal('scheduleModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <div class="form-group">
+                        <label for="scheduleSubject">Subject</label>
+                        <input type="text" id="scheduleSubject" class="form-control" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="scheduleGrade">Grade Level</label>
+                            <select id="scheduleGrade" class="form-control" required>
+                                <option value="">Select Grade</option>
+                                <option value="7">Grade 7</option>
+                                <option value="8">Grade 8</option>
+                                <option value="9">Grade 9</option>
+                                <option value="10">Grade 10</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="scheduleSection">Section (Optional)</label>
+                            <input type="text" id="scheduleSection" class="form-control" placeholder="A">
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label for="scheduleDay">Day</label>
+                            <input type="text" id="scheduleDay" class="form-control" placeholder="Mon/Wed/Fri">
+                        </div>
+                        <div class="form-group">
+                            <label for="scheduleTime">Time</label>
+                            <input type="text" id="scheduleTime" class="form-control" placeholder="8:00 AM">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="scheduleRoom">Room</label>
+                        <input type="text" id="scheduleRoom" class="form-control" placeholder="Room 101">
+                    </div>
+                    <div class="form-group">
+                        <label for="scheduleTeacher">Teacher (Optional)</label>
+                        <input type="text" id="scheduleTeacher" class="form-control" placeholder="Teacher name">
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
+                        <button type="button" class="btn-icon" onclick="closeModal('scheduleModal')">Cancel</button>
+                        <button type="submit" class="btn-primary-custom">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Create</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="submissionsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin: 0; color: var(--primary-color);"><i class="bi bi-upload"></i> Submissions</h2>
+                <button class="btn-icon" onclick="closeModal('submissionsModal')">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="submissionsList">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="bi bi-check-circle"></i>
+        <span id="toastMessage">Action completed successfully!</span>
+    </div>
+
+    <script>
+        // Global functions for modal management
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Show Toast Notification
+        function showToast(message, type = 'success') {
+
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            if (toast && toastMessage) {
+                toastMessage.textContent = message;
+
+                // Set icon based on type
+                const icon = toast.querySelector('i');
+                if (type === 'success') {
+                    icon.className = 'bi bi-check-circle';
+                    toast.style.background = '#51cf66';
+                } else if (type === 'error') {
+                    icon.className = 'bi bi-exclamation-circle';
+                    toast.style.background = '#ff6b6b';
+                }
+
+                toast.style.display = 'flex';
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // Copy to Clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Copy failed: ', err);
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        async function enforcePortalAccess(allowedRoles) {
+            if (!window.API || !API.ensureSession) {
+                window.location.href = 'login.html';
+                return null;
+            }
+
+            try {
+                const currentUser = await API.ensureSession();
+                if (!currentUser || !allowedRoles.includes(currentUser.role)) {
+                    API.clearAuth();
+                    window.location.href = 'login.html';
+                    return null;
+                }
+                return currentUser;
+            } catch (error) {
+                API.clearAuth();
+                window.location.href = 'login.html';
+                return null;
+            }
+        }
+
+        function clearStaticPortalContent() {
+            const clearTargets = [
+                'assignmentsTableBody',
+                'scheduleTableBody',
+                'submissionsList',
+                'parentMessagesTableBody',
+                'teachersTableBody',
+                'usersTableBody'
+            ];
+            clearTargets.forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        const adminRoleState = {
+            teachers: [],
+            users: [],
+            invites: [],
+            canViewUsers: false,
+            canViewInvites: false
+        };
+
+        function statusBadgeClass(status) {
+            const normalized = String(status || '').toLowerCase();
+            if (normalized === 'pending') return 'status-pending';
+            if (normalized === 'inactive') return 'status-inactive';
+            return 'status-active';
+        }
+
+        function formatRoleLabel(role) {
+            const normalized = String(role || '').toLowerCase();
+            if (!normalized) return 'Unknown';
+            return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+        }
+
+        function renderTeachersTable(searchTerm = '') {
+            const tbody = document.getElementById('teachersTableBody');
+            if (!tbody) return;
+
+            const query = String(searchTerm || '').trim().toLowerCase();
+            const usersById = new Map((adminRoleState.users || []).map((u) => [String(u._id), u]));
+            const teachers = Array.isArray(adminRoleState.teachers) ? adminRoleState.teachers : [];
+            const invites = Array.isArray(adminRoleState.invites)
+                ? adminRoleState.invites.filter((invite) => invite?.role === 'teacher' && !invite?.usedAt)
+                : [];
+
+            const teacherRows = teachers
+                .map((teacher) => {
+                    const linkedUser = usersById.get(String(teacher?.user || ''));
+                    const fullName = `${teacher?.firstName || ''} ${teacher?.lastName || ''}`.trim() || 'Unnamed Teacher';
+                    const email = linkedUser?.email || teacher?.contactInfo || '-';
+                    const subject = Array.isArray(teacher?.subjects) && teacher.subjects.length > 0
+                        ? teacher.subjects.join(', ')
+                        : (teacher?.department || 'Not set');
+                    const teacherId = teacher?.teacherId
+                        || (teacher?._id ? `TCH-${String(teacher._id).slice(-6).toUpperCase()}` : 'TCH-N/A');
+                    const searchable = `${teacherId} ${fullName} ${email} ${subject}`.toLowerCase();
+                    if (query && !searchable.includes(query)) return null;
+
+                    return `
+                        <tr>
+                            <td>${escapeHtml(teacherId)}</td>
+                            <td>${escapeHtml(fullName)}</td>
+                            <td>${escapeHtml(email)}</td>
+                            <td>${escapeHtml(subject)}</td>
+                            <td><span class="status-badge ${statusBadgeClass(teacher?.status || linkedUser?.status)}">${escapeHtml(formatRoleLabel(teacher?.status || linkedUser?.status || 'active'))}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" title="View" data-view-teacher="${escapeHtml(teacher?._id || '')}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                })
+                .filter(Boolean);
+
+            const inviteRows = invites
+                .map((invite) => {
+                    const inviteEmail = String(invite?.email || '').trim();
+                    const inviteId = `INV-${String(invite?.token || '').slice(-6).toUpperCase()}`;
+                    const searchable = `${inviteId} ${inviteEmail}`.toLowerCase();
+                    if (query && !searchable.includes(query)) return null;
+
+                    return `
+                        <tr>
+                            <td>${escapeHtml(inviteId)}</td>
+                            <td>${escapeHtml(inviteEmail || 'Pending Teacher')}</td>
+                            <td>${escapeHtml(inviteEmail || '-')}</td>
+                            <td>Invite Pending</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" title="Copy Invite Link" data-copy-invite="${escapeHtml(invite?.token || '')}">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                })
+                .filter(Boolean);
+
+            const allRows = teacherRows.concat(inviteRows);
+            if (allRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No teachers found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allRows.join('');
+
+            tbody.querySelectorAll('button[data-view-teacher]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const teacherId = btn.getAttribute('data-view-teacher');
+                    const teacher = (adminRoleState.teachers || []).find((item) => String(item?._id) === String(teacherId));
+                    if (!teacher) return;
+                    const fullName = `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim() || 'Teacher';
+                    showToast(`Teacher: ${fullName}`, 'success');
+                });
+            });
+
+            tbody.querySelectorAll('button[data-copy-invite]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const token = btn.getAttribute('data-copy-invite');
+                    if (!token) return;
+                    const inviteLink = `${window.location.origin}/register.html?invite=${encodeURIComponent(token)}`;
+                    copyToClipboard(inviteLink);
+                });
+            });
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            if (!tbody) return;
+
+            if (!adminRoleState.canViewUsers) {
+                tbody.innerHTML = '<tr><td colspan="6">Only admin users can view this table.</td></tr>';
+                return;
+            }
+
+            const users = Array.isArray(adminRoleState.users)
+                ? adminRoleState.users.filter((user) => ['admin', 'staff'].includes(String(user?.role || '').toLowerCase()))
+                : [];
+            const pendingAdminInvites = Array.isArray(adminRoleState.invites)
+                ? adminRoleState.invites.filter((invite) => invite?.role === 'admin' && !invite?.usedAt)
+                : [];
+
+            const userRows = users.map((user) => {
+                const userId = user?._id ? `USR-${String(user._id).slice(-6).toUpperCase()}` : 'USR-N/A';
+                const fullName = user?.name || 'Unnamed User';
+                const role = formatRoleLabel(user?.role);
+                const status = user?.status || 'active';
+
+                return `
+                    <tr>
+                        <td>${escapeHtml(userId)}</td>
+                        <td>${escapeHtml(fullName)}</td>
+                        <td>${escapeHtml(user?.email || '-')}</td>
+                        <td>${escapeHtml(role)}</td>
+                        <td><span class="status-badge ${statusBadgeClass(status)}">${escapeHtml(formatRoleLabel(status))}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon" title="View" data-view-user="${escapeHtml(user?._id || '')}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const inviteRows = pendingAdminInvites.map((invite) => {
+                const inviteId = `INV-${String(invite?.token || '').slice(-6).toUpperCase()}`;
+                return `
+                    <tr>
+                        <td>${escapeHtml(inviteId)}</td>
+                        <td>${escapeHtml(invite?.email || 'Pending Admin')}</td>
+                        <td>${escapeHtml(invite?.email || '-')}</td>
+                        <td>Admin (Invite)</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-icon" title="Copy Invite Link" data-copy-invite="${escapeHtml(invite?.token || '')}">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const allRows = userRows.concat(inviteRows);
+            if (allRows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No admin users found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allRows.join('');
+
+            tbody.querySelectorAll('button[data-view-user]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const userId = btn.getAttribute('data-view-user');
+                    const user = (adminRoleState.users || []).find((item) => String(item?._id) === String(userId));
+                    if (!user) return;
+                    showToast(`User: ${user.name || user.email}`, 'success');
+                });
+            });
+
+            tbody.querySelectorAll('button[data-copy-invite]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const token = btn.getAttribute('data-copy-invite');
+                    if (!token) return;
+                    const inviteLink = `${window.location.origin}/register.html?invite=${encodeURIComponent(token)}`;
+                    copyToClipboard(inviteLink);
+                });
+            });
+        }
+
+        async function loadRoleDirectory() {
+            const [teachers, usersResult, invitesResult] = await Promise.all([
+                API.teachers.list().catch(() => []),
+                API.users.list()
+                    .then((items) => ({ ok: true, items }))
+                    .catch(() => ({ ok: false, items: [] })),
+                API.invites.list()
+                    .then((items) => ({ ok: true, items }))
+                    .catch(() => ({ ok: false, items: [] }))
+            ]);
+
+            adminRoleState.teachers = Array.isArray(teachers) ? teachers : [];
+            adminRoleState.users = Array.isArray(usersResult.items) ? usersResult.items : [];
+            adminRoleState.invites = Array.isArray(invitesResult.items) ? invitesResult.items : [];
+            adminRoleState.canViewUsers = !!usersResult.ok;
+            adminRoleState.canViewInvites = !!invitesResult.ok;
+
+            const teacherSearch = document.getElementById('teacherSearch');
+            renderTeachersTable(teacherSearch ? teacherSearch.value : '');
+            renderUsersTable();
+        }
+
+        // Simple, clean JavaScript that works
+        document.addEventListener('DOMContentLoaded', async function() {
+            const currentUser = await enforcePortalAccess(['admin', 'staff']);
+            if (!currentUser) return;
+            clearStaticPortalContent();
+
+            console.log("Admin Panel Loaded Successfully");
+
+            // Fix all close buttons
+            document.querySelectorAll('.modal-close, .btn-icon, button[onclick*="closeModal"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if (this.onclick || this.getAttribute('onclick')) {
+                        // Already has onclick handler
+                        return;
+                    }
+                    const modal = this.closest('.modal-overlay');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+
+            // Menu Toggle for Mobile
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                });
+            }
+
+            // Navigation between sections
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Get the section to show
+                    const sectionId = this.getAttribute('data-section');
+
+                    // Remove active class from all links and sections
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    contentSections.forEach(s => s.classList.remove('active'));
+
+                    // Add active class to clicked link
+                    this.classList.add('active');
+
+                    // Show the corresponding section
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+
+                        // Update page title
+                        const pageTitle = document.querySelector('.page-title h1');
+                        const linkText = this.querySelector('span').textContent;
+                        if (pageTitle) {
+                            pageTitle.textContent = linkText + (sectionId === 'dashboard' ? ' Overview' : ' Management');
+                        }
+
+                        if (sectionId === 'parent-messages') {
+                            loadParentMessagesAdmin();
+                        }
+                    }
+
+                    // Close sidebar on mobile
+                    if (window.innerWidth <= 1200) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            });
+
+            // Quick Action Buttons
+            const quickAddStudent = document.getElementById('quickAddStudent');
+            if (quickAddStudent) {
+                quickAddStudent.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('studentModal');
+                });
+            }
+
+            const quickInviteTeacher = document.getElementById('quickInviteTeacher');
+            if (quickInviteTeacher) {
+                quickInviteTeacher.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('inviteTeacherModal');
+                });
+            }
+
+            const quickInviteAdmin = document.getElementById('quickInviteAdmin');
+            if (quickInviteAdmin) {
+                quickInviteAdmin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('inviteAdminModal');
+                });
+            }
+
+            const quickCreateAssignment = document.getElementById('quickCreateAssignment');
+            if (quickCreateAssignment) {
+                quickCreateAssignment.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    openModal('assignmentModal');
+                });
+            }
+
+            const quickCreateSchedule = document.getElementById('quickCreateSchedule');
+            if (quickCreateSchedule) {
+                quickCreateSchedule.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    openModal('scheduleModal');
+                });
+            }
+
+            const assignmentForm = document.getElementById('assignmentForm');
+            if (assignmentForm) {
+                assignmentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await API.assignments.create({
+                            title: document.getElementById('assignmentTitle').value,
+                            subject: document.getElementById('assignmentSubject').value,
+                            gradeLevel: document.getElementById('assignmentGrade').value,
+                            section: document.getElementById('assignmentSection').value,
+                            dueDate: document.getElementById('assignmentDueDate').value,
+                            description: document.getElementById('assignmentDescription').value
+                        });
+                        showToast('Assignment created', 'success');
+                        closeModal('assignmentModal');
+                        assignmentForm.reset();
+                        loadAssignmentsAdmin();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to create assignment', 'danger');
+                    }
+                });
+            }
+
+            const scheduleForm = document.getElementById('scheduleForm');
+            if (scheduleForm) {
+                scheduleForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await API.schedule.create({
+                            subject: document.getElementById('scheduleSubject').value,
+                            gradeLevel: document.getElementById('scheduleGrade').value,
+                            section: document.getElementById('scheduleSection').value,
+                            day: document.getElementById('scheduleDay').value,
+                            time: document.getElementById('scheduleTime').value,
+                            room: document.getElementById('scheduleRoom').value,
+                            teacherName: document.getElementById('scheduleTeacher').value
+                        });
+                        showToast('Schedule entry added', 'success');
+                        closeModal('scheduleModal');
+                        scheduleForm.reset();
+                        loadScheduleAdmin();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to add schedule', 'danger');
+                    }
+                });
+            }
+
+            // Main Action Buttons
+            const addStudentBtn = document.getElementById('addStudentBtn');
+            if (addStudentBtn) {
+                addStudentBtn.addEventListener('click', () => {
+                    openModal('studentModal');
+                });
+            }
+
+            const addTeacherBtn = document.getElementById('addTeacherBtn');
+            if (addTeacherBtn) {
+                addTeacherBtn.addEventListener('click', () => {
+                    openModal('inviteTeacherModal');
+                });
+            }
+
+            const inviteTeacherBtn = document.getElementById('inviteTeacherBtn');
+            if (inviteTeacherBtn) {
+                inviteTeacherBtn.addEventListener('click', () => {
+                    openModal('inviteTeacherModal');
+                });
+            }
+
+            const inviteAdminBtn = document.getElementById('inviteAdminBtn');
+            if (inviteAdminBtn) {
+                inviteAdminBtn.addEventListener('click', () => {
+                    openModal('inviteAdminModal');
+                });
+            }
+
+            // Copy Invite Link
+            let lastInviteToken = null;
+
+            const copyInviteLinkBtn = document.getElementById('copyInviteLinkBtn');
+            if (copyInviteLinkBtn) {
+                copyInviteLinkBtn.addEventListener('click', () => {
+                    if (!lastInviteToken) {
+                        showToast('Create an invite first to copy the link.', 'warning');
+                        return;
+                    }
+                    const inviteLink = `${window.location.origin}/register.html?invite=${lastInviteToken}`;
+                    copyToClipboard(inviteLink);
+                });
+            }
+
+            const teacherSearch = document.getElementById('teacherSearch');
+            if (teacherSearch) {
+                teacherSearch.addEventListener('input', function() {
+                    renderTeachersTable(this.value);
+                });
+            }
+
+            // Form Submissions
+            const studentForm = document.getElementById('studentForm');
+            if (studentForm) {
+                studentForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const fullName = document.getElementById('studentName').value.trim();
+                        const [firstName, ...rest] = fullName.split(' ');
+                        const lastName = rest.join(' ') || 'Student';
+
+                        const payload = {
+                            studentId: `STU-${Date.now()}`,
+                            firstName: firstName || 'Student',
+                            lastName,
+                            gradeLevel: document.getElementById('gradeLevel').value,
+                            birthDate: document.getElementById('birthDate').value,
+                            contactInfo: document.getElementById('contactInfo').value
+                        };
+
+                        await API.students.create(payload);
+                        showToast('Student added successfully!', 'success');
+                        closeModal('studentModal');
+                        studentForm.reset();
+                        loadAdminStats();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to add student', 'danger');
+                    }
+                });
+            }
+
+            const inviteTeacherForm = document.getElementById('inviteTeacherForm');
+            if (inviteTeacherForm) {
+                inviteTeacherForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const teacherName = document.getElementById('teacherName').value;
+                        const teacherEmail = document.getElementById('teacherEmail').value;
+                        const invite = await API.invites.create(teacherEmail, 'teacher');
+                        lastInviteToken = invite.token;
+                        showToast(`Invitation created for ${teacherName}`, 'success');
+                        closeModal('inviteTeacherModal');
+                        inviteTeacherForm.reset();
+                        await loadRoleDirectory();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to create invite', 'danger');
+                    }
+                });
+            }
+
+            const inviteAdminForm = document.getElementById('inviteAdminForm');
+            if (inviteAdminForm) {
+                inviteAdminForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const adminName = document.getElementById('adminName').value;
+                        const adminEmail = document.getElementById('adminEmail').value;
+                        const invite = await API.invites.create(adminEmail, 'admin');
+                        lastInviteToken = invite.token;
+                        showToast(`Admin invitation created for ${adminName}`, 'success');
+                        closeModal('inviteAdminModal');
+                        inviteAdminForm.reset();
+                        await loadRoleDirectory();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to create invite', 'danger');
+                    }
+                });
+            }
+
+            // Export Data Button
+            const exportDataBtn = document.getElementById('exportDataBtn');
+            if (exportDataBtn) {
+                exportDataBtn.addEventListener('click', () => {
+                    showToast('Data export started. Check your downloads.', 'success');
+                });
+            }
+
+            const refreshParentMessagesBtn = document.getElementById('refreshParentMessagesBtn');
+            if (refreshParentMessagesBtn) {
+                refreshParentMessagesBtn.addEventListener('click', () => {
+                    loadParentMessagesAdmin();
+                });
+            }
+
+            // Initialize Chart
+            const ctx = document.getElementById('enrollmentChart');
+            let enrollmentChart = null;
+            if (ctx) {
+                enrollmentChart = new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Number of Students',
+                            data: [],
+
+                            backgroundColor: [
+                                'rgba(15, 75, 43, 0.7)',
+                                'rgba(79, 172, 254, 0.7)',
+                                'rgba(255, 107, 107, 0.7)',
+                                'rgba(81, 207, 102, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(15, 75, 43)',
+                                'rgb(79, 172, 254)',
+                                'rgb(255, 107, 107)',
+                                'rgb(81, 207, 102)'
+                            ],
+
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            async function loadEnrollmentChart() {
+                if (!enrollmentChart) return;
+                try {
+                    const chartData = await API.request('/api/stats/charts');
+                    const enrollmentByGrade = chartData?.data?.enrollmentByGrade || [];
+                    enrollmentChart.data.labels = enrollmentByGrade.map(item => `Grade ${item._id}`);
+                    enrollmentChart.data.datasets[0].data = enrollmentByGrade.map(item => item.count);
+                    enrollmentChart.update();
+                } catch (err) {
+                    console.warn('Failed to load enrollment chart data', err);
+                    enrollmentChart.data.labels = [];
+                    enrollmentChart.data.datasets[0].data = [];
+                    enrollmentChart.update();
+                }
+            }
+
+            async function loadAdminStats() {
+                try {
+                    const [students, teachers, admissions, events] = await Promise.all([
+                        API.students.list(),
+                        API.teachers.list(),
+                        API.admissions.list(),
+                        API.events.list()
+                    ]);
+
+                    const totalStudentsValue = document.getElementById('totalStudentsValue');
+                    const totalTeachersValue = document.getElementById('totalTeachersValue');
+                    const pendingEnrollmentsValue = document.getElementById('pendingEnrollmentsValue');
+                    const upcomingEventsValue = document.getElementById('upcomingEventsValue');
+
+                    if (totalStudentsValue) totalStudentsValue.textContent = (students || []).length;
+                    if (totalTeachersValue) totalTeachersValue.textContent = (teachers || []).length;
+                    if (pendingEnrollmentsValue) pendingEnrollmentsValue.textContent = (admissions || []).length;
+                    if (upcomingEventsValue) upcomingEventsValue.textContent = (events || []).length;
+                } catch (err) {
+                    console.warn('Failed to load admin stats', err);
+                }
+            }
+
+            async function loadAssignmentsAdmin() {
+                try {
+                    const assignments = await API.assignments.list();
+                    const tbody = document.getElementById('assignmentsTableBody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+                    (assignments || []).forEach(a => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${a.title}</td>
+                            <td>${a.subject || ''}</td>
+                            <td>${a.gradeLevel}</td>
+                            <td>${a.section || ''}</td>
+                            <td>${a.dueDate ? new Date(a.dueDate).toLocaleDateString() : ''}</td>
+                            <td>
+                                <button class="btn btn-outline btn-sm" data-sub="${a._id}">Submissions</button>
+                                <button class="btn btn-outline btn-sm" data-edit="${a._id}">Edit</button>
+                                <button class="btn btn-danger btn-sm" data-id="${a._id}">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    tbody.querySelectorAll('button[data-id]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.getAttribute('data-id');
+                            if (!confirm('Delete this assignment?')) return;
+                            try {
+                                await API.assignments.remove(id);
+                                loadAssignmentsAdmin();
+                            } catch (err) {
+                                showToast(err.message || 'Failed to delete assignment', 'danger');
+                            }
+                        });
+                    });
+
+                    tbody.querySelectorAll('button[data-sub]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.getAttribute('data-sub');
+                            showSubmissions(id);
+                        });
+                    });
+
+                    tbody.querySelectorAll('button[data-edit]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.getAttribute('data-edit');
+                            const title = prompt('New title:');
+                            if (!title) return;
+                            const dueDate = prompt('Due date (YYYY-MM-DD):');
+                            if (!dueDate) return;
+                            try {
+                                await API.assignments.update(id, { title, dueDate });
+                                loadAssignmentsAdmin();
+                            } catch (err) {
+                                showToast(err.message || 'Failed to edit assignment', 'danger');
+                            }
+                        });
+                    });
+                } catch (err) {
+                    console.warn('Failed to load assignments', err);
+                }
+            }
+
+            async function loadScheduleAdmin() {
+                try {
+                    const schedule = await API.schedule.list();
+                    const tbody = document.getElementById('scheduleTableBody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+                    (schedule || []).forEach(s => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${s.subject}</td>
+                            <td>${s.gradeLevel}</td>
+                            <td>${s.section || ''}</td>
+                            <td>${s.day || ''}</td>
+                            <td>${s.time || ''}</td>
+                            <td>${s.room || ''}</td>
+                            <td><button class="btn btn-danger btn-sm" data-id="${s._id}">Delete</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    tbody.querySelectorAll('button[data-id]').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const id = btn.getAttribute('data-id');
+                            if (!confirm('Delete this schedule entry?')) return;
+                            try {
+                                await API.schedule.remove(id);
+                                loadScheduleAdmin();
+                            } catch (err) {
+                                showToast(err.message || 'Failed to delete schedule', 'danger');
+                            }
+                        });
+                    });
+                } catch (err) {
+                    console.warn('Failed to load schedule', err);
+                }
+            }
+
+            async function loadParentMessagesAdmin() {
+                const tbody = document.getElementById('parentMessagesTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '<tr><td colspan="6">Loading parent messages...</td></tr>';
+
+                try {
+                    const messages = await API.parentMessages.listAll();
+                    if (!messages || messages.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6">No parent messages yet.</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = '';
+                    messages.forEach((msg) => {
+                        const parent = msg.parent || {};
+                        const parentId = (typeof parent === 'object' && parent !== null) ? parent._id : '';
+                        const parentName = parent.firstName || parent.lastName
+                            ? `${parent.firstName || ''} ${parent.lastName || ''}`.trim()
+                            : 'Unknown Parent';
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${new Date(msg.createdAt || Date.now()).toLocaleString()}</td>
+                            <td>${escapeHtml(parentName)}</td>
+                            <td>${escapeHtml(msg.direction || '')}</td>
+                            <td>${escapeHtml(msg.subject || '')}</td>
+                            <td>${escapeHtml(msg.content || '')}</td>
+                            <td>
+                                ${parentId ? `<button class="btn btn-primary btn-sm" data-reply-parent="${parentId}" data-parent-name="${escapeHtml(parentName)}">Reply</button>` : ''}
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    tbody.querySelectorAll('button[data-reply-parent]').forEach((btn) => {
+                        btn.addEventListener('click', async () => {
+                            const parentId = btn.getAttribute('data-reply-parent');
+                            const parentName = btn.getAttribute('data-parent-name') || 'Parent';
+                            const subject = prompt(`Reply subject for ${parentName}:`);
+                            if (!subject || !subject.trim()) return;
+                            const content = prompt('Reply message:');
+                            if (!content || !content.trim()) return;
+
+                            try {
+                                await API.parentMessages.reply(parentId, {
+                                    subject: subject.trim(),
+                                    content: content.trim()
+                                });
+                                showToast('Reply sent to parent', 'success');
+                                loadParentMessagesAdmin();
+                            } catch (err) {
+                                showToast(err.message || 'Failed to send reply', 'error');
+                            }
+                        });
+                    });
+                } catch (err) {
+                    tbody.innerHTML = '<tr><td colspan="6">Failed to load parent messages.</td></tr>';
+                    showToast(err.message || 'Failed to load parent messages', 'error');
+                }
+            }
+
+            async function showSubmissions(assignmentId) {
+                try {
+                    const list = document.getElementById('submissionsList');
+                    if (list) list.innerHTML = 'Loading...';
+                    const submissions = await API.assignmentsSubmissions.list(assignmentId);
+                    if (list) {
+                        if (!submissions || submissions.length === 0) {
+                            list.innerHTML = '<p>No submissions yet.</p>';
+                        } else {
+                            list.innerHTML = submissions.map(s => `
+                                <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                                    <strong>${s.student?.firstName || ''} ${s.student?.lastName || ''}</strong>
+                                    <div>${s.fileName ? `<a href="${s.uploadId ? API.uploads.downloadUrl(s.uploadId) : s.fileUrl}" target="_blank">${s.fileName}</a>` : 'No file'}</div>
+                                    <div style="margin-top:6px;">
+                                        <input type="number" min="0" max="100" placeholder="Score" value="${s.score ?? ''}" data-score="${s._id}" style="width:100px; margin-right:6px;">
+                                        <input type="text" placeholder="Feedback" value="${s.feedback ?? ''}" data-feedback="${s._id}" style="width:60%;">
+                                        <button class="btn btn-primary btn-sm" data-grade="${s._id}" style="margin-left:6px;">Save</button>
+                                    </div>
+                                </div>
+                            `).join('');
+                            list.querySelectorAll('button[data-grade]').forEach(btn => {
+                                btn.addEventListener('click', async () => {
+                                    const id = btn.getAttribute('data-grade');
+                                    const scoreInput = list.querySelector(`input[data-score="${id}"]`);
+                                    const feedbackInput = list.querySelector(`input[data-feedback="${id}"]`);
+                                    try {
+                                        await API.assignmentsSubmissions.grade(id, {
+                                            score: scoreInput.value ? Number(scoreInput.value) : undefined,
+                                            feedback: feedbackInput.value
+                                        });
+                                        showToast('Submission graded', 'success');
+                                    } catch (err) {
+                                        showToast(err.message || 'Failed to grade submission', 'danger');
+                                    }
+                                });
+                            });
+                        }
+                    }
+                    openModal('submissionsModal');
+                } catch (err) {
+                    showToast(err.message || 'Failed to load submissions', 'danger');
+                }
+            }
+
+            await loadRoleDirectory();
+            loadAdminStats();
+            loadAssignmentsAdmin();
+            loadScheduleAdmin();
+            loadEnrollmentChart();
+
+            // Close modals when clicking outside
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+
+            // Ensure all close buttons work
+            document.querySelectorAll('button[onclick*="closeModal"], .btn-icon[onclick*="closeModal"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent modal overlay click
+                    const onclickAttr = this.getAttribute('onclick');
+                    if (onclickAttr) {
+                        // Execute the onclick function
+                        eval(onclickAttr);
+                    }
+                });
+            });
+
+            // Search functionality
+            const globalSearch = document.getElementById('globalSearch');
+            if (globalSearch) {
+                globalSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        showToast(`Searching for: ${this.value}`, 'success');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
