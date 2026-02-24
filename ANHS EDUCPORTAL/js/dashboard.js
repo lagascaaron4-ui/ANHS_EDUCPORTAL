@@ -1,9 +1,19 @@
 // Dashboard Data Loader - Fetches all data from backend API
 
-const PRODUCTION_API_URL = ''; // e.g., 'https://anhs-backend.onrender.com'
-const API_BASE_URL = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+const PRODUCTION_API_URL = 'https://anhs-educportal.onrender.com';
+const HOSTNAME = window.location.hostname;
+const IS_FILE_PROTOCOL = window.location.protocol === 'file:';
+const IS_LOOPBACK = ['localhost', '127.0.0.1', '::1'].includes(HOSTNAME);
+const IS_PRIVATE_IPV4 = /^(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})$/.test(HOSTNAME);
+const IS_LOCAL_NETWORK_HOST = IS_FILE_PROTOCOL || IS_LOOPBACK || IS_PRIVATE_IPV4 || HOSTNAME.endsWith('.local');
+const LOCAL_API_URL = IS_FILE_PROTOCOL
     ? 'http://localhost:5000'
-    : (window.ANHS_API_BASE_URL || PRODUCTION_API_URL || '');
+    : `http://${HOSTNAME || 'localhost'}:5000`;
+
+const API_BASE_URL = window.ANHS_API_BASE_URL 
+    || (IS_LOCAL_NETWORK_HOST ? LOCAL_API_URL : '')
+    || PRODUCTION_API_URL 
+    || '';
 
 async function apiFetch(endpoint) {
     const authToken = (window.API && typeof window.API.getToken === 'function' ? window.API.getToken() : null);
@@ -190,6 +200,9 @@ function formatEventDate(dateString) {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+// Store chart instances for cleanup
+window.dashboardCharts = window.dashboardCharts || {};
+
 // Initialize charts with API data
 async function initializeCharts() {
     try {
@@ -198,8 +211,12 @@ async function initializeCharts() {
         // Program Distribution Chart
         const programCtx = document.getElementById('programDistributionChart');
         if (programCtx && Array.isArray(data.data?.enrollmentByGrade) && data.data.enrollmentByGrade.length > 0) {
+            // Destroy existing chart if present
+            if (window.dashboardCharts['program']) {
+                window.dashboardCharts['program'].destroy();
+            }
             const enrollmentData = data.data.enrollmentByGrade;
-            new Chart(programCtx.getContext('2d'), {
+            window.dashboardCharts['program'] = new Chart(programCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
                     labels: enrollmentData.map(e => e._id),
@@ -224,8 +241,12 @@ async function initializeCharts() {
         // Grade Distribution Chart
         const placementCtx = document.getElementById('placementChart');
         if (placementCtx && Array.isArray(data.data?.gradeDistribution) && data.data.gradeDistribution.length > 0) {
+            // Destroy existing chart if present
+            if (window.dashboardCharts['placement']) {
+                window.dashboardCharts['placement'].destroy();
+            }
             const gradeDistribution = data.data.gradeDistribution;
-            new Chart(placementCtx.getContext('2d'), {
+            window.dashboardCharts['placement'] = new Chart(placementCtx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: gradeDistribution.map(g => g._id),

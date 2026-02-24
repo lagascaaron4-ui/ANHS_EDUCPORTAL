@@ -1576,6 +1576,7 @@
             slidesPerView: 1,
             spaceBetween: 30,
             loop: true,
+            loopAdditionalSlides: 1,
             autoplay: {
                 delay: 5000,
                 disableOnInteraction: false,
@@ -1591,12 +1592,25 @@
             breakpoints: {
                 768: {
                     slidesPerView: 2,
+                    spaceBetween: 20,
                 },
                 1024: {
                     slidesPerView: 3,
+                    spaceBetween: 30,
+                }
+            },
+            on: {
+                init: function() {
+                    // Disable loop if there aren't enough slides
+                    if (this.slides.length < 4) {
+                        this.loopDestroy();
+                    }
                 }
             }
         });
+        
+        // Store swiper reference for later use
+        window.swiper = swiper;
 
         // Navigation function
         function navigateTo(page) {
