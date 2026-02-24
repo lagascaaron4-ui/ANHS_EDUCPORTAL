@@ -2,7 +2,7 @@
 // Handles all API communications and authentication
 
 // Configuration: Set your production backend URL here after deploying to Render/Railway
-const PRODUCTION_API_URL = 'https://anhs-educportal.onrender.com'; // e.g., 'https://anhs-backend.onrender.com'
+const PRODUCTION_API_URL = 'https://anhs-educportal.onrender.com';
 const HOSTNAME = window.location.hostname;
 const IS_FILE_PROTOCOL = window.location.protocol === 'file:';
 const IS_LOOPBACK = ['localhost', '127.0.0.1', '::1'].includes(HOSTNAME);

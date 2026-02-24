@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Specialization - Aliaga National High School</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="responsive.css">
+    <script src="js/api.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8f7f5 0%, #b88b2f 50%, #fbf9f6 100%), url('anhs-removebg-preview.png') center/cover no-repeat;
+            color: #0f1720;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .spec-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: #b88b2f;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+            z-index: 100;
+        }
+
+        .back-button:hover {
+            background: #976f25;
+            transform: translateY(-2px);
+            box-shadow: 0 16px 60px rgba(0,0,0,0.2);
+        }
+
+        .spec-header {
+            text-align: center;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #0f4b2b 0%, #176a3a 100%);
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 60px;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.2);
+        }
+
+        .spec-header h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .spec-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .spec-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-top: 6px solid #176a3a;
+        }
+
+        .spec-card:hover {
+            box-shadow: 0 16px 60px rgba(0,0,0,0.15);
+            transform: translateY(-12px);
+            border-top-color: #ffd600;
+        }
+
+        .spec-card .icon {
+            font-size: 3.5rem;
+            color: #ffd600;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .spec-card h2 {
+            color: #176a3a;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .spec-card p {
+            color: #2c3e50;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .spec-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .spec-card li {
+            padding: 10px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+
+        .spec-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ffd600;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .spec-cta {
+            background: linear-gradient(135deg, #0f4b2b 0%, #176a3a 100%);
+            color: white;
+            padding: 8px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: fit-content;
+            box-shadow: 0 4px 15px rgba(23, 106, 58, 0.2);
+        }
+
+        .spec-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(23, 106, 58, 0.3);
+        }
+
+        .spec-comparison {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-bottom: 60px;
+        }
+
+        .spec-comparison h2 {
+            color: #176a3a;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.2rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #0f4b2b 0%, #176a3a 100%);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #2c3e50;
+        }
+
+        .comparison-table tr:hover {
+            background: #f9f9f9;
+        }
+
+        .accessibility-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #176a3a;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .accessibility-toggle:hover {
+            background: #0f4b2b;
+            transform: scale(1.1);
+        }
+
+        .backToTopBtn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: #ffd600;
+            color: #0f4b2b;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .backToTopBtn:hover {
+            background: #f0b800;
+            transform: translateY(-4px);
+        }
+
+        @media (max-width: 900px) {
+            .spec-header {
+                padding: 40px 20px;
+                margin-bottom: 40px;
+            }
+
+            .spec-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .spec-header p {
+                font-size: 1.1rem;
+            }
+
+            .spec-card {
+                padding: 30px;
+            }
+
+            .spec-comparison {
+                padding: 30px;
+                overflow-x: auto;
+            }
+
+            .back-button {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .spec-header {
+                padding: 40px 20px;
+                margin-bottom: 30px;
+            }
+
+            .spec-header h1 {
+                font-size: 2rem;
+            }
+
+            .spec-header p {
+                font-size: 1rem;
+            }
+
+            .spec-card {
+                padding: 20px 15px;
+            }
+
+            .spec-card h2 {
+                font-size: 1.4rem;
+            }
+
+            .spec-comparison {
+                padding: 20px 15px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="guest-main.html" class="back-button">
+        <i class="ri-arrow-left-line"></i>
+        Back to Lobby
+    </a>
+
+    <div id="site-header"></div>
+
+    <main id="main" class="spec-container">
+        <!-- Hero Section -->
+        <div class="spec-header">
+            <h1>Junior High School Specializations</h1>
+            <p>Explore Our Specialized Programs for Grades 7-10</p>
+        </div>
+
+        <!-- Specialization Cards -->
+        <div class="spec-grid" id="specGrid"></div>
+
+        <!-- Comparison Table -->
+        <div class="spec-comparison">
+            <h2>Program Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Science</th>
+                        <th>Arts</th>
+                        <th>Technology</th>
+                    </tr>
+                </thead>
+                <tbody id="comparisonBody">
+                    <tr>
+                        <td><strong>Focus</strong></td>
+                        <td>Physics, Chemistry, Biology</td>
+                        <td>Literature, History, Social Studies</td>
+                        <td>Computer Science, Engineering, IT</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Career Path</strong></td>
+                        <td>Medicine, Engineering, Research</td>
+                        <td>Law, Education, Journalism</td>
+                        <td>Software Development, IT, Tech Innovation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Subjects</strong></td>
+                        <td>Advanced Math, Labs, Projects</td>
+                        <td>Critical Thinking, Analysis, Discussion</td>
+                        <td>Programming, Coding, Practical Projects</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <button id="backToTopBtn" class="backToTopBtn">
+        <i class="ri-arrow-up-line"></i>
+    </button>
+
+    <button id="accessibilityToggle" class="accessibility-toggle" title="Toggle High Contrast">
+        <i class="ri-contrast-2-line"></i>
+    </button>
+
+    <script>
+        // Specialization Manager Class
+        class SpecializationManager {
+            constructor() {
+                this.specGrid = document.getElementById('specGrid');
+                this.specializations = [];
+                this.init();
+            }
+
+            init() {
+                this.loadSpecializations();
+            }
+
+            async loadSpecializations() {
+                try {
+                    if (!window.API || !API.programs || typeof API.programs.list !== 'function') {
+                        throw new Error('API client unavailable');
+                    }
+                    const data = await API.programs.list();
+                    this.specializations = Array.isArray(data) ? data : (data?.data || []);
+                    this.renderSpecializations();
+                } catch (error) {
+                    console.error('Error loading specializations:', error);
+                    this.specializations = [];
+                    this.renderSpecializations();
+                }
+            }
+
+            renderSpecializations() {
+                if (this.specializations.length > 0) {
+                    this.specGrid.innerHTML = '';
+                    this.specializations.forEach(spec => {
+                        const card = this.createSpecCard(spec);
+                        this.specGrid.appendChild(card);
+                    });
+                } else {
+                    this.specGrid.innerHTML = `
+                        <div class="spec-card" style="grid-column: 1 / -1; text-align: center;">
+                            <h2>No Programs Available</h2>
+                            <p>Specializations will appear here once published by the school administration.</p>
+                        </div>
+                    `;
+                }
+            }
+
+            createSpecCard(spec) {
+                const card = document.createElement('div');
+                card.className = 'spec-card';
+                
+                const icon = spec.icon || 'ri-graduation-cap-line';
+                const name = spec.name || 'Specialization';
+                const description = spec.description || 'Learn more about this specialization';
+                const subjects = spec.subjects || [];
+
+                // Determine enrollment URL based on specialization name
+                let enrollmentUrl = 'admission.html';
+                if (name === 'Science') {
+                    enrollmentUrl = 'enrollment-science.html';
+                } else if (name === 'Arts') {
+                    enrollmentUrl = 'enrollment-arts.html';
+                } else if (name === 'Technology') {
+                    enrollmentUrl = 'enrollment-technology.html';
+                }
+
+                let subjectsHtml = '';
+                if (Array.isArray(subjects)) {
+                    subjects.forEach(subject => {
+                        subjectsHtml += `<li>${this.escapeHtml(subject)}</li>`;
+                    });
+                }
+
+                card.innerHTML = `
+                    <i class="ri-${icon.replace('ri-', '')}" style="font-size:3.5rem; color:#ffd600; margin-bottom:20px; display:inline-block;"></i>
+                    <h2>${this.escapeHtml(name)}</h2>
+                    <p>${this.escapeHtml(description)}</p>
+                    <ul>
+                        ${subjectsHtml || '<li>Comprehensive curriculum</li>'}
+                    </ul>
+                    <button class="spec-cta" onclick="window.location.href='${enrollmentUrl}'">Apply Now</button>
+                `;
+
+                return card;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        // Initialize on page load
+        let specializationManager;
+        document.addEventListener('DOMContentLoaded', function() {
+            specializationManager = new SpecializationManager();
+        });
+    </script>
+
+    <script>
+        async function loadHighContrastPreference() {
+            if (!window.API || !API.preferences) return false;
+            try {
+                const data = await API.preferences.get();
+                return !!data?.preferences?.highContrast;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        async function saveHighContrastPreference(isHighContrast) {
+            if (!window.API || !API.preferences) return;
+            try {
+                const current = await API.preferences.get().catch(() => ({ preferences: {} }));
+                const merged = Object.assign({}, current?.preferences || {}, { highContrast: isHighContrast });
+                await API.preferences.update(merged);
+            } catch (error) {
+                console.warn('Failed to save high contrast preference', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('accessibilityToggle');
+            if (!toggle) return;
+            toggle.addEventListener('click', function() {
+                document.body.classList.toggle('high-contrast');
+                const isHighContrast = document.body.classList.contains('high-contrast');
+                saveHighContrastPreference(isHighContrast);
+            });
+            loadHighContrastPreference().then((enabled) => {
+                if (enabled) {
+                    document.body.classList.add('high-contrast');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('backToTopBtn');
+            if (!btn) return;
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    btn.style.display = 'flex';
+                } else {
+                    btn.style.display = 'none';
+                }
+            });
+            btn.addEventListener('click', function() {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+
+    <div id="site-header"></div>
+    <header>
+        <div class="header-container">
+            <div class="header-left">
+                <div class="menu-button">
+                    <button id="navToggle" class="menu-toggle">
+                        Menu
+                        <i class="ri-menu-line"></i>
+                    </button>
+
+                    <div id="mainNav" class="menu-dropdown">
+                        <a href="main.html" class="menu-item">Home</a>
+                        <a href="about us.html" class="menu-item">About Us</a>
+                        <a href="specialization.html" class="menu-item" id="specializationBtn">Specialization</a>
+                        <a href="admission.html" class="menu-item" id="admissionsBtn">Admissions</a>
+                        <a href="news-events.html" class="menu-item" id="newsEventsBtn">News & Events</a>
+                        <a href="contact.html" class="menu-item">Contact Us</a>
+                        <a href="#" class="menu-item" id="loginRegisterBtn">Login/Register</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logo">
+                <img src="anhs-removebg-preview.png" alt="Aliaga National High School Logo" />
+                <div>
+                    <h1>Aliaga National High School</h1>
+                    <p>Be an ANAHASIANS.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main">
+        <h2>Junior High School Specializations</h2>
+        <div class="specialization-card">
+            <div class="icon"><i class="ri-flask-line"></i></div>
+            <h3>Science, Technology, Engineering (STE)</h3>
+            <p>Enriched curriculum in science and mathematics, hands-on laboratory activities, and technology integration for students with strong science and technology interests.</p>
+        </div>
+        <div class="specialization-card">
+            <div class="icon"><i class="ri-palette-line"></i></div>
+            <h3>Special Program in the Arts (SPA)</h3>
+            <p>Focused training in music, visual arts, dance, theater, and creative writing for students with artistic talents and interests.</p>
+        </div>
+        <div class="specialization-card">
+            <div class="icon"><i class="ri-computer-line"></i></div>
+            <h3>Special Program in Information and Communications Technology (ICT)</h3>
+            <p>Specialized curriculum focusing on computer programming, network administration, digital media, and other essential ICT skills for the digital age.</p>
+        </div>
+        <div class="specialization-card">
+            <div class="icon"><i class="ri-book-line"></i></div>
+            <h3>Regular Curriculum</h3>
+            <p>Comprehensive academic program covering core subjects and values education, designed to develop well-rounded learners prepared for future academic pathways.</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+                    <div style="font-family:'Pacifico',cursive;font-size:1.25rem;color:#ffd600;">
+                        <img src="anhs-removebg-preview.png" alt="Aliaga National High School circular seal featuring a torch above an open book with laurel branches, rays of light, and the year 1946. Text reads Aliaga National High School and Aliaga, Nueva Ecija. The design uses blue, yellow, and green colors, conveying a sense of pride and academic achievement." />
+                    </div>
+                </div>
+                <p style="font-size:0.95rem;opacity:0.9;margin-bottom:16px;">Excellence in Education</p>
+                <div style="font-size:0.95rem;">
+                    <p>1234 Education Drive</p>
+                    <p>Aliaga, Nueva Ecija</p>
+                    <p>Phone: (555) 123-4567</p>
+                    <p>Email: @Aliaganationalhighschool.edu</p>
+                </div>
+            </div>
+            <div>
+                <div class="footer-title">Quick Links</div>
+                <ul class="footer-list">
+                    <li><a href="main.html">About Us</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="specialization.html">Academics</a></li>
+                    <li><a href="admission.html">Admissions</a></li>
+                    <li><a href="#">Faculty</a></li>
+                    <li><a href="#">Campus Life</a></li>
+                    <li><a href="#">Athletics</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">Resources</div>
+                <ul class="footer-list">
+                    <li><a href="#">Student Portal</a></li>
+                    <li><a href="#">Parent Portal</a></li>
+                    <li><a href="#">Library</a></li>
+                    <li><a href="#">Calendar</a></li>
+                    <li><a href="main.html#news-events-section">News</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-title">Stay Connected</div>
+                <div class="footer-social">
+                    <a href="#"><i class="ri-facebook-fill"></i></a>
+                    <a href="#"><i class="ri-twitter-fill"></i></a>
+                    <a href="#"><i class="ri-instagram-fill"></i></a>
+                    <a href="#"><i class="ri-youtube-fill"></i></a>
+                </div>
+                <div class="footer-newsletter">
+                    <div style="font-weight:500;margin-bottom:8px;">Newsletter Signup</div>
+                    <div style="display:flex;">
+                        <input type="email" placeholder="Your email" />
+                        <button>Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Aliaga National High School. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+     <!-- Authentication modal added so the nav Login/Register works on this page -->
+    <div id="authModal" class="auth-modal" aria-hidden="true">
+        <div class="auth-backdrop" id="authBackdrop"></div>
+        <div class="auth-content" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+            <div class="auth-header">
+                <h3 id="authTitle">Login</h3>
+                <button class="auth-close" id="authCloseBtn" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="auth-forms">
+                <form id="loginForm" class="active" autocomplete="off">
+                    <div class="auth-row">
+                        <label class="sr-only">User type</label>
+                        <select id="userType" required>
+                            <option value="">Select role</option>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                            <option value="parent">Parent</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="auth-row">
+                        <input id="loginEmail" type="email" placeholder="Email" required>
+                    </div>
+                    <div class="auth-row">
+                        <input id="loginPassword" type="password" placeholder="Password" required>
+                    </div>
+                    <div class="auth-row" style="display:flex;gap:8px;align-items:center;">
+                        <button type="button" id="sendCodeBtn" class="btn-primary" style="flex:1;background:#0b5;">Send login code to email</button>
+                    </div>
+                    <div id="codeVerifyArea" style="display:none;">
+                        <div class="auth-row">
+                            <input id="loginCode" type="text" placeholder="One-time code (123456)" pattern="\\d{6}">
+                        </div>
+                        <div class="auth-row">
+                            <input id="loginPasswordVerify" type="password" placeholder="Password (for this account)">
+                        </div>
+                        <div class="auth-actions">
+                            <button type="button" id="verifyCodeBtn" class="btn-primary">Verify code & login</button>
+                        </div>
+                        <div id="codePreview" style="font-size:0.9rem;color:#666;display:none;margin-top:8px;"></div>
+                    </div>
+                    <div class="auth-actions">
+                        <button type="submit" class="btn-primary">Login</button>
+                        <button type="button" id="showRegister" class="btn-secondary">Register</button>
+                    </div>
+                </form>
+
+                <form id="registerForm" autocomplete="off">
+                    <div class="auth-row">
+                        <input id="registerFirstName" type="text" placeholder="First name" required>
+                    </div>
+                    <div class="auth-row">
+                        <input id="registerLastName" type="text" placeholder="Last name" required>
+                    </div>
+                    <div class="auth-row">
+                        <input id="registerEmail" type="email" placeholder="Email" required>
+                    </div>
+                    <div class="auth-row">
+                        <input id="registerParentEmail" type="email" placeholder="Parent / Guardian Email (optional)">
+                    </div>
+                    <div class="auth-row">
+                        <input id="registerPassword" type="password" placeholder="Password" required>
+                    </div>
+                    <div class="auth-row" style="display:flex;gap:8px;align-items:center;">
+                        <button type="button" id="sendRegCodeBtn" class="btn-primary" style="flex:1;background:#0b5;">Send registration code to email</button>
+                    </div>
+                    <div id="regCodeArea" style="display:none;">
+                        <div class="auth-row">
+                            <input id="regCode" type="text" placeholder="One-time code (123456)" pattern="\\d{6}">
+                        </div>
+                        <div class="auth-row">
+                            <input id="regPasswordVerify" type="password" placeholder="Confirm password">
+                        </div>
+                        <div class="auth-actions">
+                            <button type="button" id="verifyRegBtn" class="btn-primary">Verify code & complete registration</button>
+                        </div>
+                        <div id="regCodePreview" style="font-size:0.9rem;color:#666;display:none;margin-top:8px;"></div>
+                    </div>
+                    <div class="auth-row">
+                        <select id="registerGradeLevel" required>
+                            <option value="">Select grade level</option>
+                            <option value="G7">Grade 7</option>
+                            <option value="G8">Grade 8</option>
+                            <option value="G9">Grade 9</option>
+                            <option value="G10">Grade 10</option>
+                        </select>
+                    </div>
+                    <div class="auth-actions">
+                        <button type="submit" class="btn-primary">Register</button>
+                        <button type="button" id="showLogin" class="btn-secondary">Back to Login</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="auth-switch">
+                By logging in you accept school policies.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            // Elements
+            const loginBtn = document.getElementById('loginRegisterBtn');
+            const authModal = document.getElementById('authModal');
+            const authBackdrop = document.getElementById('authBackdrop');
+            const authCloseBtn = document.getElementById('authCloseBtn');
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const showRegister = document.getElementById('showRegister');
+            const showLogin = document.getElementById('showLogin');
+
+            function openModal(mode = 'login'){
+                authModal.style.display = 'flex';
+                authModal.setAttribute('aria-hidden','false');
+                document.getElementById('authTitle').textContent = (mode === 'login') ? 'Login' : 'Student Registration';
+                if(mode === 'login'){
+                    loginForm.classList.add('active');
+                    registerForm.classList.remove('active');
+                } else {
+                    registerForm.classList.add('active');
+                    loginForm.classList.remove('active');
+                }
+            }
+
+            // Send-code and verify handlers (calls backend endpoints)
+            const sendCodeBtn = document.getElementById('sendCodeBtn');
+            const codeVerifyArea = document.getElementById('codeVerifyArea');
+            const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+            const codePreview = document.getElementById('codePreview');
+
+            if(sendCodeBtn){
+                sendCodeBtn.addEventListener('click', async function(){
+                    const email = (document.getElementById('loginEmail')||{}).value?.trim()||'';
+                    if(!email){ alert('Enter an email to send code to.'); return; }
+                    sendCodeBtn.disabled = true; sendCodeBtn.textContent = 'Sending...';
+                    try{
+                        const resp = await fetch('/api/auth/request-code', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email }) });
+                        const data = await resp.json();
+                        if(!resp.ok) throw new Error(data.message||'Failed to send code');
+                        codeVerifyArea.style.display = 'block';
+                        if(data.preview){ codePreview.innerHTML = 'Preview email: <a href="'+data.preview+'" target="_blank">open</a>'; codePreview.style.display='block'; }
+                    }catch(err){ alert(err.message||'Failed to send code'); }
+                    finally{ sendCodeBtn.disabled = false; sendCodeBtn.textContent = 'Send login code to email'; }
+                });
+            }
+
+            if(verifyCodeBtn){
+                verifyCodeBtn.addEventListener('click', async function(){
+                    const email = (document.getElementById('loginEmail')||{}).value?.trim()||'';
+                    const code = (document.getElementById('loginCode')||{}).value||'';
+                    const password = (document.getElementById('loginPasswordVerify')||{}).value||'';
+                    if(!email || !code || !password){ alert('Provide email, code and password to verify.'); return; }
+                    verifyCodeBtn.disabled = true; verifyCodeBtn.textContent = 'Verifying...';
+                    try{
+                        try {
+                            await handleVerifyAndStoreJwt(email, code, { password, purpose: 'login' });
+                        } catch (e) {
+                            throw e;
+                        }
+                        const userRole = data.user?.role || (document.getElementById('userType')||{}).value||'student';
+                        const dest = { student:'Students.html', teacher:'Teachers Portal.html', parent:'parents.html', admin:'admin.html' }[userRole]||'main.html';
+                        alert('Login successful'); closeModal(); setTimeout(()=> window.location.href = dest, 300);
+                    }catch(err){ alert(err.message||'Verification failed'); }
+                    finally{ verifyCodeBtn.disabled = false; verifyCodeBtn.textContent = 'Verify code & login'; }
+                });
+            }
+
+            const sendRegCodeBtn = document.getElementById('sendRegCodeBtn');
+            const regCodeArea = document.getElementById('regCodeArea');
+            const verifyRegBtn = document.getElementById('verifyRegBtn');
+            const regCodePreview = document.getElementById('regCodePreview');
+
+            if(sendRegCodeBtn){
+                sendRegCodeBtn.addEventListener('click', async function(){
+                    const email = (document.getElementById('registerEmail')||{}).value?.trim()||'';
+                    const firstName = (document.getElementById('registerFirstName')||{}).value?.trim()||'';
+                    const lastName = (document.getElementById('registerLastName')||{}).value?.trim()||'';
+                    const gradeLevel = (document.getElementById('registerGradeLevel')||{}).value||'';
+                    const parentEmail = (document.getElementById('registerParentEmail')||{}).value?.trim()||'';
+                    const password = (document.getElementById('registerPassword')||{}).value||'';
+                    if(!email){ alert('Enter an email to send code to.'); return; }
+                    sendRegCodeBtn.disabled = true; sendRegCodeBtn.textContent = 'Sending...';
+                    try{
+                        const resp = await fetch('/api/auth/request-code', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ email, firstName, lastName, gradeLevel, parentEmail, password, role: 'student' }) });
+                        const data = await resp.json();
+                        if(!resp.ok) throw new Error(data.message||'Failed to send code');
+                        regCodeArea.style.display = 'block';
+                        if(data.previewUrl){ regCodePreview.innerHTML = 'Preview email: <a href="'+data.previewUrl+'" target="_blank">open</a>'; regCodePreview.style.display='block'; }
+                    }catch(err){ alert(err.message||'Failed to send code'); }
+                    finally{ sendRegCodeBtn.disabled = false; sendRegCodeBtn.textContent = 'Send registration code to email'; }
+                });
+            }
+
+            if(verifyRegBtn){
+                verifyRegBtn.addEventListener('click', async function(){
+                    const email = (document.getElementById('registerEmail')||{}).value?.trim()||'';
+                    const code = (document.getElementById('regCode')||{}).value||'';
+                    if(!email || !code){ alert('Provide email and code to verify.'); return; }
+                    verifyRegBtn.disabled = true; verifyRegBtn.textContent = 'Verifying...';
+                    try{
+                        await handleVerifyAndStoreJwt(email, code);
+                        alert('Registration successful'); closeModal(); setTimeout(()=> window.location.href = 'main.html', 300);
+                    }catch(err){ alert(err.message||'Verification failed'); }
+                    finally{ verifyRegBtn.disabled = false; verifyRegBtn.textContent = 'Verify code & complete registration'; }
+                });
+            }
+            function closeModal(){
+                authModal.style.display = 'none';
+                authModal.setAttribute('aria-hidden','true');
+            }
+
+            if(loginBtn){
+                loginBtn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    openModal('login');
+                });
+            }
+
+            if(authBackdrop){
+                authBackdrop.addEventListener('click', closeModal);
+            }
+            if(authCloseBtn){
+                authCloseBtn.addEventListener('click', closeModal);
+            }
+            // switch to register
+            if(showRegister){
+                showRegister.addEventListener('click', function(e){
+                    e.preventDefault();
+                    openModal('register');
+                });
+            }
+            if(showLogin){
+                showLogin.addEventListener('click', function(e){
+                    e.preventDefault();
+                    openModal('login');
+                });
+            }
+
+            // Login submit
+            if(loginForm){
+                loginForm.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const email = (document.getElementById('loginEmail')||{}).value?.trim()||'';
+                    const password = (document.getElementById('loginPassword')||{}).value||'';
+                    const userType = (document.getElementById('userType')||{}).value||'';
+
+                    if(!userType){
+                        alert('Please select a role.');
+                        return;
+                    }
+                    if(!email || !password){
+                        alert('Enter email and password.');
+                        return;
+                    }
+
+                    try {
+                        const result = await API.login(email, password, userType);
+                        if (result.user.role !== userType) {
+                            alert(`Selected role does not match account role (${result.user.role}).`);
+                            return;
+                        }
+                        alert('Login successful. Redirecting...');
+                        closeModal();
+                        const dest = {
+                            student:'Students.html',
+                            teacher:'Teachers Portal.html',
+                            parent:'parents.html',
+                            admin:'admin.html'
+                        }[userType] || 'main.html';
+                        setTimeout(()=> window.location.href = dest, 300);
+                    } catch (err) {
+                        alert(err.message || 'Invalid credentials. Try again.');
+                    }
+                });
+            }
+
+            // Register submit
+            if(registerForm){
+                registerForm.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    const firstName = (document.getElementById('registerFirstName')||{}).value?.trim()||'';
+                    const lastName = (document.getElementById('registerLastName')||{}).value?.trim()||'';
+                    const email = (document.getElementById('registerEmail')||{}).value?.trim()||'';
+                    const password = (document.getElementById('registerPassword')||{}).value||'';
+                    const gradeLevel = (document.getElementById('registerGradeLevel')||{}).value||'';
+
+                    if(!firstName || !lastName || !email || !password || !gradeLevel){
+                        alert('Please fill all registration fields.');
+                        return;
+                    }
+
+                    try {
+                        const fullName = `${firstName} ${lastName}`.trim();
+                        await API.register(
+                            fullName,
+                            email,
+                            password,
+                            'student',
+                            null,
+                            firstName,
+                            lastName,
+                            { studentId: `STU-${Date.now()}`, gradeLevel }
+                        );
+                        alert('Registration successful. Please login.');
+                        openModal('login');
+                    } catch (err) {
+                        alert(err.message || 'Registration failed.');
+                    }
+                });
+            }
+
+            // keyboard escape to close
+            document.addEventListener('keydown', function(e){
+                if(e.key === 'Escape' && authModal.style.display === 'flex') closeModal();
+            });
+        })();
+
+        // Menu toggle functionality
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+
+        navToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('open');
+        });
+
+        // Close menu when clicking a menu item
+        mainNav.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                mainNav.classList.remove('open');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!navToggle.contains(event.target) && !mainNav.contains(event.target)) {
+                mainNav.classList.remove('open');
+            }
+        });
+    </script>
+
+    <script src="darkmode.js"></script>
+
+    <div id="site-footer"></div>
+</body>
+</html>
