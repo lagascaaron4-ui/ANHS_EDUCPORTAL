@@ -9,8 +9,8 @@ const IS_LOOPBACK = ['localhost', '127.0.0.1', '::1'].includes(HOSTNAME);
 const IS_PRIVATE_IPV4 = /^(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})$/.test(HOSTNAME);
 const IS_LOCAL_NETWORK_HOST = IS_FILE_PROTOCOL || IS_LOOPBACK || IS_PRIVATE_IPV4 || HOSTNAME.endsWith('.local');
 const LOCAL_API_URL = IS_FILE_PROTOCOL
-    ? 'http://localhost:5000'
-    : `http://${HOSTNAME || 'localhost'}:5000`;
+    ? 'http://localhost:10000'
+    : `http://${HOSTNAME || 'localhost'}:10000`;
 
 const API_BASE_URL = window.ANHS_API_BASE_URL
     || (IS_LOCAL_NETWORK_HOST ? LOCAL_API_URL : '')
