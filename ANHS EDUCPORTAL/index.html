@@ -1688,8 +1688,15 @@
         function initializeCharts() {
 
             // Performance Chart - based on typical public school trends
-            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-            new Chart(performanceCtx, {
+            (function(){
+                const perfCanvas = document.getElementById('performanceChart');
+                if (!perfCanvas) return;
+                window.dashboardCharts = window.dashboardCharts || {};
+                if (window.dashboardCharts['performance']) {
+                    try { window.dashboardCharts['performance'].destroy(); } catch(e) { /* ignore */ }
+                }
+                const performanceCtx = perfCanvas.getContext('2d');
+                window.dashboardCharts['performance'] = new Chart(performanceCtx, {
                 type: 'line',
                 data: {
                     labels: ['2019', '2020', '2021', '2022', '2023'],
@@ -1732,11 +1739,19 @@
                         }
                     }
                 }
-            });
+                });
+            })();
 
             // Program Distribution Chart - JHS Grade Level Distribution
-            const programCtx = document.getElementById('programDistributionChart').getContext('2d');
-            new Chart(programCtx, {
+            (function(){
+                const programCanvas = document.getElementById('programDistributionChart');
+                if (!programCanvas) return;
+                window.dashboardCharts = window.dashboardCharts || {};
+                if (window.dashboardCharts['program']) {
+                    try { window.dashboardCharts['program'].destroy(); } catch(e) { /* ignore */ }
+                }
+                const programCtx = programCanvas.getContext('2d');
+                window.dashboardCharts['program'] = new Chart(programCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
@@ -1760,12 +1775,20 @@
                         }
                     }
                 }
-            });
+                });
+            })();
 
 
             // Placement Chart - Post-Graduation Pathways
-            const placementCtx = document.getElementById('placementChart').getContext('2d');
-            new Chart(placementCtx, {
+            (function(){
+                const placementCanvas = document.getElementById('placementChart');
+                if (!placementCanvas) return;
+                window.dashboardCharts = window.dashboardCharts || {};
+                if (window.dashboardCharts['placement']) {
+                    try { window.dashboardCharts['placement'].destroy(); } catch(e) { /* ignore */ }
+                }
+                const placementCtx = placementCanvas.getContext('2d');
+                window.dashboardCharts['placement'] = new Chart(placementCtx, {
                 type: 'bar',
                 data: {
                     labels: ['College', 'TESDA', 'Employment', 'Entrepreneurship', 'Other'],
@@ -1791,7 +1814,8 @@
                         }
                     }
                 }
-            });
+                });
+            })();
 
             // Satisfaction Chart - School Services
             const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
