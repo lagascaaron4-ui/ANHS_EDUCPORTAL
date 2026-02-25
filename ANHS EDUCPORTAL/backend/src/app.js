@@ -69,6 +69,10 @@ app.use(cors({
   },
   credentials: !allowAnyOrigin
 }));
+
+// Log configured CORS behavior for visibility
+const displayedOrigins = configuredOrigins.length ? configuredOrigins.join(', ') : (allowAnyOrigin ? '*' : '[none configured]');
+console.log(`CORS configured. Allowed origins: ${displayedOrigins}. Credentials allowed: ${!allowAnyOrigin}`);
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.PUBLIC_UPLOADS === 'true') {
