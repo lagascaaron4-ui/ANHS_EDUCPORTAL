@@ -16,7 +16,7 @@ services:
       - key: JWT_SECRET
         generateValue: true  # Auto-generate a secure secret
       - key: CORS_ORIGIN
-        sync: false  # Set this to your Netlify URL after deployment
+        value: https://anhs-educportal.vercel.app
       - key: UPLOAD_DIR
         value: uploads
       - key: PUBLIC_UPLOADS
