@@ -1601,9 +1601,19 @@
             },
             on: {
                 init: function() {
-                    // Disable loop if there aren't enough slides
-                    if (this.slides.length < 4) {
-                        this.loopDestroy();
+                    // Compute effective slidesPerView (respecting breakpoints) and disable loop when insufficient slides
+                    const slidesCount = this.slides?.length || 0;
+                    let required = this.params.slidesPerView || 1;
+                    if (this.params.breakpoints) {
+                        const bps = Object.keys(this.params.breakpoints).map(k => Number(k)).filter(n => !Number.isNaN(n)).sort((a,b) => a - b);
+                        for (const bp of bps) {
+                            if (window.innerWidth >= bp) {
+                                required = this.params.breakpoints[bp].slidesPerView || required;
+                            }
+                        }
+                    }
+                    if (slidesCount < required && this.loop) {
+                        try { this.loopDestroy(); } catch (e) { /* ignore */ }
                     }
                 }
             }
@@ -1684,170 +1694,11 @@
             }
         }
 
-        // Initialize charts - will be populated with API data
+        // Initialize charts - will be populated with API data from `js/dashboard.js`
         function initializeCharts() {
-
-            // Performance Chart - based on typical public school trends
-            (function(){
-                const perfCanvas = document.getElementById('performanceChart');
-                if (!perfCanvas) return;
-                window.dashboardCharts = window.dashboardCharts || {};
-                if (window.dashboardCharts['performance']) {
-                    try { window.dashboardCharts['performance'].destroy(); } catch(e) { /* ignore */ }
-                }
-                const performanceCtx = perfCanvas.getContext('2d');
-                window.dashboardCharts['performance'] = new Chart(performanceCtx, {
-                type: 'line',
-                data: {
-                    labels: ['2019', '2020', '2021', '2022', '2023'],
-                    datasets: [{
-                        label: 'NAT Average Score',
-                        data: [85, 87, 88, 89, 91],
-                        borderColor: '#1a6633',
-                        backgroundColor: 'rgba(26, 102, 51, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                    }, {
-                        label: 'Graduation Rate %',
-                        data: [95, 96, 97, 97, 98],
-                        borderColor: '#ffd700',
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            min: 80,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-                });
-            })();
-
-            // Program Distribution Chart - JHS Grade Level Distribution
-            (function(){
-                const programCanvas = document.getElementById('programDistributionChart');
-                if (!programCanvas) return;
-                window.dashboardCharts = window.dashboardCharts || {};
-                if (window.dashboardCharts['program']) {
-                    try { window.dashboardCharts['program'].destroy(); } catch(e) { /* ignore */ }
-                }
-                const programCtx = programCanvas.getContext('2d');
-                window.dashboardCharts['program'] = new Chart(programCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'],
-                    datasets: [{
-                        data: [28, 26, 24, 22],
-                        backgroundColor: [
-                            '#1a6633',
-                            '#2d8b4a',
-                            '#ffd700',
-                            '#b88b2f'
-                        ],
-                        borderWidth: 0,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        }
-                    }
-                }
-                });
-            })();
-
-
-            // Placement Chart - Post-Graduation Pathways
-            (function(){
-                const placementCanvas = document.getElementById('placementChart');
-                if (!placementCanvas) return;
-                window.dashboardCharts = window.dashboardCharts || {};
-                if (window.dashboardCharts['placement']) {
-                    try { window.dashboardCharts['placement'].destroy(); } catch(e) { /* ignore */ }
-                }
-                const placementCtx = placementCanvas.getContext('2d');
-                window.dashboardCharts['placement'] = new Chart(placementCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['College', 'TESDA', 'Employment', 'Entrepreneurship', 'Other'],
-                    datasets: [{
-                        label: 'Graduates',
-                        data: [70, 15, 5, 5, 5],
-                        backgroundColor: '#1a6633',
-                        borderRadius: 8,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 80,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-                });
-            })();
-
-            // Satisfaction Chart - School Services
-            const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
-            new Chart(satisfactionCtx, {
-                type: 'radar',
-                data: {
-                    labels: ['Teaching Quality', 'Facilities', 'Guidance', 'Activities', 'Administration', 'Safety'],
-                    datasets: [{
-                        label: 'Parent/Student Satisfaction',
-                        data: [92, 85, 90, 88, 86, 94],
-                        backgroundColor: 'rgba(26, 102, 51, 0.2)',
-                        borderColor: '#1a6633',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#1a6633',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            // Charts are created and managed by `js/dashboard.js` using API data.
+            // This stub prevents duplicate initializations when `Dashboard.initialize()` runs.
+            return;
         }
 
         // Initialize page
