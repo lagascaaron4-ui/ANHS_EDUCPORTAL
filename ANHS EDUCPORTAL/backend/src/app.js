@@ -37,10 +37,21 @@ const { notFound, errorHandler } = require('./middleware/error');
 const app = express();
 
 const isProduction = process.env.NODE_ENV === 'production';
-const configuredOrigins = (process.env.CORS_ORIGIN || '')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+
+// Build configured origins. If `CORS_ORIGIN` isn't provided in production,
+// default to the known frontend and API host for this project so the public
+// portal can fetch data. For stricter security set `CORS_ORIGIN` in env.
+let configuredOrigins = [];
+if (process.env.CORS_ORIGIN && process.env.CORS_ORIGIN.trim()) {
+  configuredOrigins = process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean);
+} else if (isProduction) {
+  configuredOrigins = [
+    'https://anhs-educportal.vercel.app',
+    'https://anhs-educportal.onrender.com'
+  ];
+} else {
+  configuredOrigins = [];
+}
 const allowAnyOrigin = configuredOrigins.includes('*');
 const localDevOriginPattern = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i;
 

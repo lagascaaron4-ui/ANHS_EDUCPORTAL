@@ -8,8 +8,10 @@ const PORT = process.env.PORT || 5000;
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
 const requiredEnv = ['MONGODB_URI', 'JWT_SECRET'];
 
-if (process.env.NODE_ENV === 'production') {
-  requiredEnv.push('CORS_ORIGIN');
+// In production it's recommended to set CORS_ORIGIN, but allow the server
+// to run with a safe default if the environment variable wasn't provided.
+if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
+  console.warn('CORS_ORIGIN is not set. The server will use default allowed origins for the public frontend.');
 }
 
 const missingEnv = requiredEnv.filter((name) => !process.env[name]);
