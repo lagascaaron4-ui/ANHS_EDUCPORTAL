@@ -507,28 +507,28 @@
                 <a href="#students" class="nav-link" data-section="students">
                     <i class="bi bi-people-fill"></i>
                     <span>Students</span>
-                    <span class="nav-badge">1,245</span>
+                    <span class="nav-badge" id="navStudentsCount">0</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#teachers" class="nav-link" data-section="teachers">
                     <i class="bi bi-person-badge-fill"></i>
                     <span>Teachers</span>
-                    <span class="nav-badge">48</span>
+                    <span class="nav-badge" id="navTeachersCount">0</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#enrollments" class="nav-link" data-section="enrollments">
                     <i class="bi bi-clipboard-check-fill"></i>
                     <span>Enrollments</span>
-                    <span class="nav-badge">23</span>
+                    <span class="nav-badge" id="navEnrollmentsCount">0</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#announcements" class="nav-link" data-section="announcements">
                     <i class="bi bi-megaphone-fill"></i>
                     <span>Announcements</span>
-                    <span class="nav-badge">15</span>
+                    <span class="nav-badge" id="navAnnouncementsCount">0</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -541,7 +541,7 @@
                 <a href="#reports" class="nav-link" data-section="reports">
                     <i class="bi bi-graph-up"></i>
                     <span>Reports</span>
-                    <span class="nav-badge">8</span>
+                    <span class="nav-badge" id="navReportsCount">0</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -884,7 +884,29 @@
                 <h2><i class="bi bi-clipboard-check-fill"></i> Enrollment Management</h2>
                 <small>Manage student enrollments and applications</small>
             </div>
-            <p style="text-align: center; padding: 40px; color: #666;">Enrollment management content will appear here</p>
+            <div style="margin-bottom: 16px;">
+                <button class="btn-primary-custom" id="refreshEnrollmentsBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh Enrollments</span>
+                </button>
+            </div>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reference #</th>
+                            <th>Student Name</th>
+                            <th>Grade</th>
+                            <th>Guardian</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enrollmentsTableBody">
+                        <tr><td colspan="6">Open this section to load enrollments.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <section id="announcements" class="content-section">
@@ -892,7 +914,46 @@
                 <h2><i class="bi bi-megaphone-fill"></i> Announcements</h2>
                 <small>Create and manage school announcements</small>
             </div>
-            <p style="text-align: center; padding: 40px; color: #666;">Announcements content will appear here</p>
+            <form id="announcementForm" style="background: white; padding: 16px; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label for="announcementTitle">Title</label>
+                        <input id="announcementTitle" class="form-control" type="text" required placeholder="Announcement title">
+                    </div>
+                    <div class="form-group">
+                        <label for="announcementPriority">Priority</label>
+                        <select id="announcementPriority" class="form-control">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="announcementContent">Content</label>
+                    <textarea id="announcementContent" class="form-control" rows="3" required placeholder="Write the announcement..."></textarea>
+                </div>
+                <button class="btn-primary-custom" type="submit">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Publish Announcement</span>
+                </button>
+            </form>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Content</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementsTableBody">
+                        <tr><td colspan="5">Open this section to load announcements.</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <section id="parent-messages" class="content-section">
@@ -930,7 +991,40 @@
                 <h2><i class="bi bi-graph-up"></i> Reports & Analytics</h2>
                 <small>Generate and view school reports</small>
             </div>
-            <p style="text-align: center; padding: 40px; color: #666;">Reports content will appear here</p>
+            <div style="margin-bottom: 16px;">
+                <button class="btn-primary-custom" id="refreshReportsBtn">
+                    <i class="bi bi-arrow-clockwise"></i>
+                    <span>Refresh Reports</span>
+                </button>
+            </div>
+            <div class="stats-grid" id="reportsStatsGrid" style="margin-bottom: 16px;">
+                <div class="stat-card">
+                    <div class="stat-label">Students</div>
+                    <div class="stat-value" id="reportStudentsCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Teachers</div>
+                    <div class="stat-value" id="reportTeachersCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Programs</div>
+                    <div class="stat-value" id="reportProgramsCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">News</div>
+                    <div class="stat-value" id="reportNewsCount">0</div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div style="background: white; border-radius: 10px; padding: 16px;">
+                    <h4 style="margin-top: 0;">Recent Announcements</h4>
+                    <ul id="reportsRecentAnnouncements" style="padding-left: 18px; margin: 0;"></ul>
+                </div>
+                <div style="background: white; border-radius: 10px; padding: 16px;">
+                    <h4 style="margin-top: 0;">Upcoming Events</h4>
+                    <ul id="reportsUpcomingEvents" style="padding-left: 18px; margin: 0;"></ul>
+                </div>
+            </div>
         </section>
 
         <section id="settings" class="content-section">
@@ -938,7 +1032,41 @@
                 <h2><i class="bi bi-gear-fill"></i> System Settings</h2>
                 <small>Configure system preferences and options</small>
             </div>
-            <p style="text-align: center; padding: 40px; color: #666;">Settings content will appear here</p>
+            <form id="settingsForm" style="background: white; border-radius: 10px; padding: 16px; max-width: 720px;">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="prefDarkMode">
+                        Enable Dark Mode
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="prefHighContrast">
+                        Enable High Contrast
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="prefRememberUser">
+                        Remember Last Login
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="prefRememberedRole">Default Role</label>
+                    <select id="prefRememberedRole" class="form-control">
+                        <option value="">None</option>
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="student">Student</option>
+                        <option value="parent">Parent</option>
+                    </select>
+                </div>
+                <button class="btn-primary-custom" type="submit">
+                    <i class="bi bi-save"></i>
+                    <span>Save Settings</span>
+                </button>
+            </form>
         </section>
 
     </main>
@@ -1297,12 +1425,16 @@
         function clearStaticPortalContent() {
             const clearTargets = [
                 'studentsTableBody',
+                'enrollmentsTableBody',
+                'announcementsTableBody',
                 'assignmentsTableBody',
                 'scheduleTableBody',
                 'submissionsList',
                 'parentMessagesTableBody',
                 'teachersTableBody',
-                'usersTableBody'
+                'usersTableBody',
+                'reportsRecentAnnouncements',
+                'reportsUpcomingEvents'
             ];
             clearTargets.forEach((id) => {
                 const el = document.getElementById(id);
@@ -1324,6 +1456,8 @@
             teachers: [],
             users: [],
             invites: [],
+            admissions: [],
+            announcements: [],
             canViewUsers: false,
             canViewInvites: false
         };
@@ -1385,6 +1519,169 @@
             } catch (err) {
                 const tbody = document.getElementById('studentsTableBody');
                 if (tbody) tbody.innerHTML = '<tr><td colspan="5">Failed to load students from backend.</td></tr>';
+            }
+        }
+
+        function formatDateTime(value) {
+            if (!value) return '-';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '-';
+            return date.toLocaleString();
+        }
+
+        function updateSidebarBadges({ students = 0, teachers = 0, enrollments = 0, announcements = 0, reports = 0 }) {
+            const targets = [
+                ['navStudentsCount', students],
+                ['navTeachersCount', teachers],
+                ['navEnrollmentsCount', enrollments],
+                ['navAnnouncementsCount', announcements],
+                ['navReportsCount', reports]
+            ];
+            targets.forEach(([id, value]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = String(value);
+            });
+        }
+
+        function renderEnrollmentsTable() {
+            const tbody = document.getElementById('enrollmentsTableBody');
+            if (!tbody) return;
+
+            const enrollments = Array.isArray(adminRoleState.admissions) ? adminRoleState.admissions : [];
+            if (enrollments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No enrollment applications found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = enrollments.map((item) => `
+                <tr>
+                    <td>${escapeHtml(formatDateTime(item.submittedAt || item.createdAt))}</td>
+                    <td>${escapeHtml(item.referenceNumber || '-')}</td>
+                    <td>${escapeHtml(item.studentName || '-')}</td>
+                    <td>${escapeHtml(item.gradeLevel || '-')}</td>
+                    <td>${escapeHtml(item.guardianName || '-')}</td>
+                    <td><span class="status-badge ${statusBadgeClass(item.status || 'pending')}">${escapeHtml(formatRoleLabel(item.status || 'pending'))}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadEnrollmentApplications() {
+            try {
+                const admissions = await API.admissions.list();
+                adminRoleState.admissions = Array.isArray(admissions) ? admissions : [];
+                renderEnrollmentsTable();
+            } catch (err) {
+                const tbody = document.getElementById('enrollmentsTableBody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="6">Failed to load enrollments.</td></tr>';
+            }
+        }
+
+        function renderAnnouncementsTable() {
+            const tbody = document.getElementById('announcementsTableBody');
+            if (!tbody) return;
+            const items = Array.isArray(adminRoleState.announcements) ? adminRoleState.announcements : [];
+
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">No announcements yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = items.map((item) => `
+                <tr>
+                    <td>${escapeHtml(formatDateTime(item.createdAt))}</td>
+                    <td>${escapeHtml(item.title || '-')}</td>
+                    <td>${escapeHtml(formatRoleLabel(item.priority || 'normal'))}</td>
+                    <td>${escapeHtml(item.content || item.message || '-')}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" data-delete-announcement="${escapeHtml(item._id || '')}">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.querySelectorAll('button[data-delete-announcement]').forEach((btn) => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.getAttribute('data-delete-announcement');
+                    if (!id) return;
+                    if (!confirm('Delete this announcement?')) return;
+                    try {
+                        await API.announcements.remove(id);
+                        showToast('Announcement deleted', 'success');
+                        await loadAnnouncementsAdmin();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to delete announcement', 'error');
+                    }
+                });
+            });
+        }
+
+        async function loadAnnouncementsAdmin() {
+            try {
+                const announcements = await API.announcements.list();
+                adminRoleState.announcements = Array.isArray(announcements) ? announcements : [];
+                renderAnnouncementsTable();
+            } catch (err) {
+                const tbody = document.getElementById('announcementsTableBody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5">Failed to load announcements.</td></tr>';
+            }
+        }
+
+        async function loadReportsAdmin() {
+            try {
+                const [dashboard, events, announcements] = await Promise.all([
+                    API.request('/api/stats/dashboard'),
+                    API.events.list().catch(() => []),
+                    API.announcements.list().catch(() => [])
+                ]);
+
+                const counts = dashboard?.data?.counts || {};
+                const students = Number(counts.students || 0);
+                const teachers = Number(counts.teachers || 0);
+                const programs = Number(counts.programs || 0);
+                const news = Number(counts.news || 0);
+
+                const reportStudentsCount = document.getElementById('reportStudentsCount');
+                const reportTeachersCount = document.getElementById('reportTeachersCount');
+                const reportProgramsCount = document.getElementById('reportProgramsCount');
+                const reportNewsCount = document.getElementById('reportNewsCount');
+                if (reportStudentsCount) reportStudentsCount.textContent = String(students);
+                if (reportTeachersCount) reportTeachersCount.textContent = String(teachers);
+                if (reportProgramsCount) reportProgramsCount.textContent = String(programs);
+                if (reportNewsCount) reportNewsCount.textContent = String(news);
+
+                const recentAnnouncementsList = document.getElementById('reportsRecentAnnouncements');
+                if (recentAnnouncementsList) {
+                    const recent = Array.isArray(announcements) ? announcements.slice(0, 5) : [];
+                    recentAnnouncementsList.innerHTML = recent.length
+                        ? recent.map((item) => `<li>${escapeHtml(item.title || 'Untitled')} (${escapeHtml(formatDateTime(item.createdAt))})</li>`).join('')
+                        : '<li>No announcements.</li>';
+                }
+
+                const upcomingEventsList = document.getElementById('reportsUpcomingEvents');
+                if (upcomingEventsList) {
+                    const upcoming = Array.isArray(events) ? events.slice(0, 5) : [];
+                    upcomingEventsList.innerHTML = upcoming.length
+                        ? upcoming.map((item) => `<li>${escapeHtml(item.title || item.name || 'Untitled')} (${escapeHtml(formatDateTime(item.startDate || item.date))})</li>`).join('')
+                        : '<li>No upcoming events.</li>';
+                }
+            } catch (err) {
+                showToast(err.message || 'Failed to load reports', 'error');
+            }
+        }
+
+        async function loadSettingsForm() {
+            try {
+                const response = await API.preferences.get();
+                const pref = response?.preferences || {};
+                const prefDarkMode = document.getElementById('prefDarkMode');
+                const prefHighContrast = document.getElementById('prefHighContrast');
+                const prefRememberUser = document.getElementById('prefRememberUser');
+                const prefRememberedRole = document.getElementById('prefRememberedRole');
+                if (prefDarkMode) prefDarkMode.checked = !!pref.darkMode;
+                if (prefHighContrast) prefHighContrast.checked = !!pref.highContrast;
+                if (prefRememberUser) prefRememberUser.checked = !!pref.rememberUser;
+                if (prefRememberedRole) prefRememberedRole.value = pref.rememberedRole || '';
+            } catch (err) {
+                showToast(err.message || 'Failed to load settings', 'error');
             }
         }
 
@@ -1675,6 +1972,14 @@
 
                         if (sectionId === 'parent-messages') {
                             loadParentMessagesAdmin();
+                        } else if (sectionId === 'enrollments') {
+                            loadEnrollmentApplications();
+                        } else if (sectionId === 'announcements') {
+                            loadAnnouncementsAdmin();
+                        } else if (sectionId === 'reports') {
+                            loadReportsAdmin();
+                        } else if (sectionId === 'settings') {
+                            loadSettingsForm();
                         }
                     }
 
@@ -1893,6 +2198,51 @@
                 });
             }
 
+            const announcementForm = document.getElementById('announcementForm');
+            if (announcementForm) {
+                announcementForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const payload = {
+                            title: document.getElementById('announcementTitle').value.trim(),
+                            content: document.getElementById('announcementContent').value.trim(),
+                            priority: document.getElementById('announcementPriority').value || 'normal'
+                        };
+                        if (!payload.title || !payload.content) {
+                            showToast('Title and content are required.', 'error');
+                            return;
+                        }
+                        await API.announcements.create(payload);
+                        announcementForm.reset();
+                        showToast('Announcement published', 'success');
+                        await loadAnnouncementsAdmin();
+                        await loadAdminStats();
+                    } catch (err) {
+                        showToast(err.message || 'Failed to publish announcement', 'error');
+                    }
+                });
+            }
+
+            const settingsForm = document.getElementById('settingsForm');
+            if (settingsForm) {
+                settingsForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const preferences = {
+                            darkMode: !!document.getElementById('prefDarkMode')?.checked,
+                            highContrast: !!document.getElementById('prefHighContrast')?.checked,
+                            rememberUser: !!document.getElementById('prefRememberUser')?.checked,
+                            rememberedRole: document.getElementById('prefRememberedRole')?.value || '',
+                            rememberedEmail: currentUser.email || ''
+                        };
+                        await API.preferences.update(preferences);
+                        showToast('Settings saved', 'success');
+                    } catch (err) {
+                        showToast(err.message || 'Failed to save settings', 'error');
+                    }
+                });
+            }
+
             // Export Data Button
             const exportDataBtn = document.getElementById('exportDataBtn');
             if (exportDataBtn) {
@@ -1905,6 +2255,20 @@
             if (refreshParentMessagesBtn) {
                 refreshParentMessagesBtn.addEventListener('click', () => {
                     loadParentMessagesAdmin();
+                });
+            }
+
+            const refreshEnrollmentsBtn = document.getElementById('refreshEnrollmentsBtn');
+            if (refreshEnrollmentsBtn) {
+                refreshEnrollmentsBtn.addEventListener('click', () => {
+                    loadEnrollmentApplications();
+                });
+            }
+
+            const refreshReportsBtn = document.getElementById('refreshReportsBtn');
+            if (refreshReportsBtn) {
+                refreshReportsBtn.addEventListener('click', () => {
+                    loadReportsAdmin();
                 });
             }
 
@@ -1970,11 +2334,12 @@
 
             async function loadAdminStats() {
                 try {
-                    const [students, teachers, admissions, events] = await Promise.all([
+                    const [students, teachers, admissions, events, announcements] = await Promise.all([
                         API.students.list(),
                         API.teachers.list(),
                         API.admissions.list(),
-                        API.events.list()
+                        API.events.list(),
+                        API.announcements.list().catch(() => [])
                     ]);
 
                     const totalStudentsValue = document.getElementById('totalStudentsValue');
@@ -1986,6 +2351,16 @@
                     if (totalTeachersValue) totalTeachersValue.textContent = (teachers || []).length;
                     if (pendingEnrollmentsValue) pendingEnrollmentsValue.textContent = (admissions || []).length;
                     if (upcomingEventsValue) upcomingEventsValue.textContent = (events || []).length;
+
+                    adminRoleState.admissions = Array.isArray(admissions) ? admissions : [];
+                    adminRoleState.announcements = Array.isArray(announcements) ? announcements : [];
+                    updateSidebarBadges({
+                        students: (students || []).length,
+                        teachers: (teachers || []).length,
+                        enrollments: adminRoleState.admissions.length,
+                        announcements: adminRoleState.announcements.length,
+                        reports: (events || []).length
+                    });
                 } catch (err) {
                     console.warn('Failed to load admin stats', err);
                 }
@@ -2199,6 +2574,10 @@
             await loadRoleDirectory();
             loadAdminStudents();
             loadAdminStats();
+            loadEnrollmentApplications();
+            loadAnnouncementsAdmin();
+            loadReportsAdmin();
+            loadSettingsForm();
             loadAssignmentsAdmin();
             loadScheduleAdmin();
             loadEnrollmentChart();

@@ -617,7 +617,6 @@
                                     <option value="teacher">Teacher/Instructor</option>
                                     <option value="parent">Parent/Guardian</option>
                                     <option value="admin">Administrator</option>
-                                    <option value="guest">Guest Visitor</option>
                                 </select>
                             </div>
                             <div id="role-help" class="sr-only">Select your role to sign in with appropriate credentials</div>
@@ -649,15 +648,15 @@
                             <small class="help-text" id="passwordHint">For parents: Use the password sent to your email when your child registered</small>
                         </div>
 
-                        <!-- Teacher/Admin Invitation Code Field (Hidden by default) -->
+                        <!-- Invitation code is used on registration, not login -->
                         <div id="invitationCodeGroup" class="form-group" style="display: none;">
-                            <label for="invitationCode">Invitation Code (Staff Only) <span class="text-red-500">*</span></label>
+                            <label for="invitationCode">Invitation Code (Registration Only)</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-key input-icon" aria-hidden="true"></i>
                                 <input type="text" id="invitationCode" name="invitationCode" placeholder="Enter invitation code" aria-describedby="invitation-help">
                             </div>
                             <div id="invitation-help" class="sr-only">Enter the invitation code provided by your school administrator</div>
-                            <small class="help-text">Required for first-time staff login. Contact admin if you don't have one.</small>
+                            <small class="help-text">Use this when creating staff accounts in `register.html`.</small>
                         </div>
                     </fieldset>
 
@@ -761,10 +760,9 @@
         // Role-specific instructions
         const roleInstructions = {
             student: "Use your school-issued email address (e.g., student@school.edu) and password provided by your school.",
-            teacher: "Use your staff email address and the password provided by the administration. First-time login requires an invitation code.",
+            teacher: "Use your staff email address and password. Invitation codes are required only during registration.",
             parent: "Use the email address your child registered during their account setup. Check your email for initial password.",
-            admin: "Use your administrative credentials. Contact IT support if you need access.",
-            guest: "Limited access for visitors. Contact administration for extended access."
+            admin: "Use your administrative credentials. Contact IT support if you need access."
         };
 
         // Password toggle functionality
@@ -793,14 +791,9 @@
             const invitationGroup = document.getElementById('invitationCodeGroup');
             const invitationInput = document.getElementById('invitationCode');
 
-            // Show/hide invitation code field for staff roles
-            if (selectedRole === 'teacher' || selectedRole === 'admin') {
-                invitationGroup.style.display = 'block';
-                invitationInput.required = true;
-            } else {
-                invitationGroup.style.display = 'none';
-                invitationInput.required = false;
-            }
+            // Login itself does not require invitation code.
+            invitationGroup.style.display = 'none';
+            invitationInput.required = false;
 
             // Update instructions
             if (selectedRole && roleInstructions[selectedRole]) {
@@ -815,7 +808,7 @@
                         break;
                     case 'teacher':
                         emailHint.textContent = 'Use your staff email address (e.g., firstname.lastname@school.edu)';
-                        passwordHint.textContent = 'Use your staff password. First login requires invitation code.';
+                        passwordHint.textContent = 'Use your staff password. Invitation is only for account registration.';
                         break;
                     case 'parent':
                         emailHint.textContent = 'Use the exact email address your child registered for you';
@@ -824,10 +817,6 @@
                     case 'admin':
                         emailHint.textContent = 'Use your administrative email address';
                         passwordHint.textContent = 'Use your administrative password. Contact IT for password reset.';
-                        break;
-                    case 'guest':
-                        emailHint.textContent = 'Use guest credentials provided by administration';
-                        passwordHint.textContent = 'Temporary password provided for guest access';
                         break;
                 }
             } else {
@@ -856,14 +845,6 @@
             if (!role) {
                 showError('Please select your role before signing in.');
                 document.getElementById('userRole').focus();
-                return;
-            }
-
-            if (role === 'guest') {
-                showSuccess('Redirecting to guest portal...');
-                setTimeout(() => {
-                    window.location.href = 'guest.html';
-                }, 600);
                 return;
             }
 
@@ -933,9 +914,6 @@
                                 break;
                             case 'admin':
                                 window.location.href = 'admin.html';
-                                break;
-                            case 'guest':
-                                window.location.href = 'guest.html';
                                 break;
                             default:
                                 window.location.href = 'main.html';
