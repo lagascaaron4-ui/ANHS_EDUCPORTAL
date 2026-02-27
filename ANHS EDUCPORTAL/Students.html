@@ -3212,6 +3212,7 @@
 
             const pending = (links || []).filter(l => l.status === 'pending');
             const approved = (links || []).filter(l => l.status === 'approved');
+            const rejected = (links || []).filter(l => l.status === 'rejected');
 
             const pendingHtml = pending.length
                 ? pending.map(l => `
@@ -3219,6 +3220,7 @@
                         <div>
                             <strong>Parent request</strong><br>
                             <small>${l.parent?.firstName || ''} ${l.parent?.lastName || ''}</small>
+                            <div style="font-size:12px; color:#ffc107; margin-top:4px;">Status: Pending</div>
                         </div>
                         <div>
                             <button class="swal2-confirm swal2-styled" data-approve="${l._id}" style="margin-right:6px;">Approve</button>
@@ -3229,7 +3231,11 @@
                 : '<p style="margin:10px 0;">No pending requests.</p>';
 
             const approvedHtml = approved.length
-                ? approved.map(l => `<li>${l.parent?.firstName || ''} ${l.parent?.lastName || ''}</li>`).join('')
+                ? approved.map(l => `<li>${l.parent?.firstName || ''} ${l.parent?.lastName || ''} <small style="color:#28a745;">(Approved)</small></li>`).join('')
+                : '<li>None</li>';
+
+            const rejectedHtml = rejected.length
+                ? rejected.map(l => `<li>${l.parent?.firstName || ''} ${l.parent?.lastName || ''} <small style="color:#dc3545;">(Rejected)</small></li>`).join('')
                 : '<li>None</li>';
 
             Swal.fire({
@@ -3240,6 +3246,8 @@
                         ${pendingHtml}
                         <h4 style="margin-top:16px;">Approved Parents</h4>
                         <ul>${approvedHtml}</ul>
+                        <h4 style="margin-top:16px;">Rejected Requests</h4>
+                        <ul>${rejectedHtml}</ul>
                     </div>
                 `,
                 showConfirmButton: false,

@@ -1020,6 +1020,7 @@
             name: 'Parent',
             profile: null,
             children: [],
+            links: [],
             messages: [],
             announcements: [],
             approvedLinkIds: []
@@ -1029,6 +1030,7 @@
             return {
                 name: parentPortalState.name,
                 children: parentPortalState.children,
+                links: parentPortalState.links,
                 messages: parentPortalState.messages,
                 announcements: parentPortalState.announcements
             };
@@ -1220,20 +1222,20 @@
                     API.parentsMe.get().catch(() => null),
                     API.parentMessages.listMy().catch(() => [])
                 ]);
-                const children = (links || [])
-                    .filter(link => link.status === 'approved')
-                    .map(link => {
-                        const student = link.student || {};
-                        return {
-                            id: student.studentId,
-                            studentDbId: student._id,
-                            name: `${student.firstName || ''} ${student.lastName || ''}`.trim() || student.studentId,
-                            gradeLevel: student.gradeLevel ? `Grade ${student.gradeLevel}` : 'N/A',
-                            status: student.status || 'active',
-                            grades: [],
-                            attendance: []
-                        };
-                    });
+                const linkedChildren = (links || []).map((link) => {
+                    const student = link.student || {};
+                    return {
+                        id: student.studentId,
+                        studentDbId: student._id,
+                        name: `${student.firstName || ''} ${student.lastName || ''}`.trim() || student.studentId || 'Unknown Student',
+                        gradeLevel: student.gradeLevel ? `Grade ${student.gradeLevel}` : 'N/A',
+                        studentStatus: student.status || 'active',
+                        linkStatus: link.status || 'pending',
+                        linkId: link._id,
+                        grades: [],
+                        attendance: []
+                    };
+                });
 
                 const approvedIds = (links || []).filter(l => l.status === 'approved').map(l => l._id);
                 const newlyApproved = approvedIds.filter(id => !parentPortalState.approvedLinkIds.includes(id));
@@ -1248,7 +1250,8 @@
 
                 parentPortalState.name = displayName || currentUser?.name || 'Parent';
                 parentPortalState.profile = parentProfile || null;
-                parentPortalState.children = children;
+                parentPortalState.links = Array.isArray(links) ? links : [];
+                parentPortalState.children = linkedChildren;
                 parentPortalState.messages = (messages || []).map((msg) => ({
                     id: msg._id,
                     from: msg.fromName || 'School',
@@ -1316,7 +1319,8 @@
             if (!data) return;
             
             // Update counts
-            document.getElementById('numChildren').textContent = data.children ? data.children.length : 0;
+            const approvedChildrenCount = (data.children || []).filter(c => c.linkStatus === 'approved').length;
+            document.getElementById('numChildren').textContent = approvedChildrenCount;
             
             const unreadMessages = data.messages ? data.messages.filter(msg => !msg.read).length : 0;
             document.getElementById('unreadMessages').textContent = unreadMessages;
@@ -1333,8 +1337,8 @@
             // Update upcoming events (for demo, we'll use announcement count)
             document.getElementById('upcomingEvents').textContent = data.announcements ? data.announcements.length : 0;
             
-            // Update pending actions
-            const pendingActions = 0; // You can add logic to calculate this
+            // Update pending actions (parent link requests waiting for approval)
+            const pendingActions = (data.links || []).filter(link => link.status === 'pending').length;
             document.getElementById('pendingActions').textContent = pendingActions;
             
             // Update parent name
@@ -1354,7 +1358,7 @@
                     activityItem.className = 'message-item';
                     activityItem.innerHTML = `
                         <strong><i class="fas fa-child"></i> ${child.name}</strong>
-                        <p>${child.gradeLevel} - ${child.status}</p>
+                        <p>${child.gradeLevel} - Link: ${child.linkStatus}</p>
                         <small>Last updated: Today</small>
                     `;
                     activityList.appendChild(activityItem);
@@ -1398,14 +1402,15 @@
                     <div class="child-info">
                         <div>
                             <p><strong>Grade Level:</strong> ${child.gradeLevel}</p>
-                            <p><strong>Status:</strong> ${child.status}</p>
+                            <p><strong>Link Status:</strong> ${child.linkStatus || 'pending'}</p>
+                            <p><strong>Student Status:</strong> ${child.studentStatus || 'active'}</p>
                         </div>
                         <div>
                             <p><strong>Last Grade Update:</strong> ${child.grades && child.grades.length > 0 ? `${child.grades[0].subject}: ${child.grades[0].score ?? child.grades[0].grade ?? 'N/A'}` : 'N/A'}</p>
                             <p><strong>Attendance Rate:</strong> ${calculateAttendanceRate(child.attendance)}%</p>
                         </div>
                     </div>
-                    <button class="btn-primary" onclick="selectChildForDetails('${child.id}')">
+                    <button class="btn-primary" onclick="selectChildForDetails('${child.id}')" ${child.linkStatus !== 'approved' ? 'disabled' : ''}>
                         <i class="fas fa-chart-line"></i> View Details
                     </button>
                 `;
@@ -1458,7 +1463,7 @@
             selectChildGrades.innerHTML = '<option value="">-- Select Child --</option>';
             
             if (children && children.length > 0) {
-                children.forEach(child => {
+                children.filter(child => child.linkStatus === 'approved').forEach(child => {
                     const option = document.createElement('option');
                     option.value = child.id;
                     option.textContent = `${child.name} (${child.gradeLevel})`;
