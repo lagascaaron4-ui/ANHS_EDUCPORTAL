@@ -868,8 +868,6 @@
                         <label for="messageRecipient">Send Message To:</label>
                         <select id="messageRecipient" class="form-control">
                             <option value="">-- Select Recipient --</option>
-                            <option value="teacher1">Teacher John Doe (Grade 7 Math)</option>
-                            <option value="teacher2">Teacher Jane Smith (Grade 8 Science)</option>
                             <option value="admin">School Administration</option>
                             <option value="principal">Principal's Office</option>
                         </select>
@@ -1283,6 +1281,7 @@
                 populateChildrenList(stateSnapshot.children);
                 populateChildSelect(stateSnapshot.children);
                 renderMessages(stateSnapshot.messages);
+                populateMessageRecipients(stateSnapshot.messages);
                 renderAnnouncements(stateSnapshot.announcements);
 
             } catch (error) {
@@ -1609,6 +1608,27 @@
                 inboxMessagesDiv.appendChild(messageItem);
             });
         }
+
+        function populateMessageRecipients(messages) {
+            const select = document.getElementById('messageRecipient');
+            if (!select) return;
+
+            const senders = Array.from(new Set(
+                (messages || [])
+                    .filter((msg) => msg && msg.direction !== 'outbound')
+                    .map((msg) => String(msg.from || '').trim())
+                    .filter(Boolean)
+            ));
+
+            const options = ['<option value="">-- Select Recipient --</option>']
+                .concat(senders.map((sender) => `<option value="${sender}">${sender}</option>`));
+
+            if (!senders.length) {
+                options.push('<option value="School Administration">School Administration</option>');
+            }
+
+            select.innerHTML = options.join('');
+        }
         
         // Send message
         async function sendMessage() {
@@ -1633,6 +1653,7 @@
                     date: new Date(created.createdAt || Date.now()).toLocaleString()
                 });
                 renderMessages(parentPortalState.messages);
+                populateMessageRecipients(parentPortalState.messages);
                 updateDashboard(snapshotPortalState());
                 showToast('Message sent successfully!', 'success');
 

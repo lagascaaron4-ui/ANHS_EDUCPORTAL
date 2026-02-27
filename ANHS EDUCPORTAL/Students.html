@@ -2788,12 +2788,12 @@
                             S
                         </div>
                         <h3 id="profileFullName">Student</h3>
-                        <p style="color: var(--dark-gray); margin-bottom: 20px;">Grade 10</p>
+                        <p id="profileGradeTag" style="color: var(--dark-gray); margin-bottom: 20px;">-</p>
 
                         
                         <div style="background: rgba(26, 102, 51, 0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                             <div style="font-size: 12px; color: var(--dark-gray); margin-bottom: 5px;">Student ID</div>
-                            <div style="font-weight: 600; color: var(--primary-green);">2023-00123</div>
+                            <div id="studentProfileId" style="font-weight: 600; color: var(--primary-green);">-</div>
                         </div>
                         
                         <div style="background: rgba(26, 102, 51, 0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
@@ -2803,7 +2803,7 @@
                         
                         <div style="background: rgba(26, 102, 51, 0.05); padding: 15px; border-radius: 10px;">
                             <div style="font-size: 12px; color: var(--dark-gray); margin-bottom: 5px;">Academic Year</div>
-                            <div style="font-weight: 600; color: var(--primary-green);">2023-2024</div>
+                            <div id="profileAcademicYear" style="font-weight: 600; color: var(--primary-green);">-</div>
                         </div>
                     </div>
 
@@ -2818,15 +2818,15 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Date of Birth:</span>
-                                <span class="info-value">June 15, 2008</span>
+                                <span class="info-value" id="profileInfoBirthDate">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Gender:</span>
-                                <span class="info-value">Male</span>
+                                <span class="info-value" id="profileInfoGender">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Address:</span>
-                                <span class="info-value">123 Main Street, Aliaga, Nueva Ecija</span>
+                                <span class="info-value" id="profileInfoAddress">-</span>
                             </div>
                         </div>
 
@@ -2844,11 +2844,11 @@
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Phone:</span>
-                                <span class="info-value">+63 912 345 6789</span>
+                                <span class="info-value" id="profileInfoPhone">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Emergency Contact:</span>
-                                <span class="info-value">Maria Dela Cruz (Mother) - +63 923 456 7890</span>
+                                <span class="info-value" id="profileInfoEmergency">-</span>
                             </div>
                         </div>
 
@@ -2858,11 +2858,11 @@
                             </h4>
                             <div class="info-row">
                                 <span class="info-label">Grade Level:</span>
-                                <span class="info-value">Grade 10</span>
+                                <span class="info-value" id="profileInfoGradeLevel">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Section:</span>
-                                <span class="info-value">10-A</span>
+                                <span class="info-value" id="profileInfoSection">-</span>
                             </div>
 
                             <div class="info-row">
@@ -2980,6 +2980,8 @@
         let notifications = [];
         let assignments = [];
         let grades = [];
+        let resources = [];
+        let gradeTrendChart = null;
         let currentConversation = 'Mr. Johnson';
         
         async function enforcePortalAccess(allowedRoles) {
@@ -3004,23 +3006,99 @@
         }
 
         function clearStaticPortalContent() {
-            const selectors = ['.grades-grid', '.assignments-list', '.notifications-list', '.schedule-list'];
+            const selectors = ['.grades-grid', '.assignments-list', '.notifications-list', '.resources-grid', '.schedule-list'];
             selectors.forEach((selector) => {
-                const el = document.querySelector(selector);
-                if (el) el.innerHTML = '';
+                document.querySelectorAll(selector).forEach((el) => {
+                    el.innerHTML = '';
+                });
             });
+
+            document.querySelectorAll('#grades .table tbody, #assignments .table tbody, #resourcesTable tbody').forEach((tbody) => {
+                tbody.innerHTML = '';
+            });
+
             const avg = document.getElementById('avgGradeValue');
             if (avg) avg.textContent = 'N/A';
             const pending = document.getElementById('pendingCount');
             if (pending) pending.textContent = '0 pending assignments';
             const announcements = document.getElementById('announcementCount');
             if (announcements) announcements.textContent = '0 new announcements';
+            const gpa = document.getElementById('gpaValue');
+            if (gpa) gpa.textContent = 'N/A';
+            const gpaQuick = document.getElementById('currentGPA');
+            if (gpaQuick) gpaQuick.textContent = 'N/A';
+            const tasks = document.getElementById('completedTasks');
+            if (tasks) tasks.textContent = '0/0';
+        }
+
+        function simplifyStudentPortal() {
+            const removeNode = (selector) => {
+                const node = document.querySelector(selector);
+                if (!node) return;
+                const navItem = node.closest('.nav-item');
+                if (navItem) {
+                    navItem.remove();
+                    return;
+                }
+                node.remove();
+            };
+
+            // Remove schedule/messages navigation and sections
+            removeNode('.nav-link[data-section="schedule"]');
+            removeNode('.nav-link[data-section="messages"]');
+            removeNode('#schedule');
+            removeNode('#messages');
+
+            // Remove dashboard schedule and calendar blocks
+            const dashboardCards = document.querySelectorAll('#dashboard .dashboard-card');
+            dashboardCards.forEach((card) => {
+                const title = card.querySelector('.card-header h3')?.textContent || '';
+                if (title.includes("Today's Schedule")) card.remove();
+                if (title.includes('Achievements')) card.remove();
+                if (title.includes('Recent Activity')) card.remove();
+            });
+            removeNode('#calendar');
+            const calendarWidget = document.querySelector('#dashboard .calendar-widget');
+            if (calendarWidget) calendarWidget.remove();
+
+            // Remove teacher-specific quick actions
+            removeNode('button[onclick="contactTeacher()"]');
+            removeNode('button[onclick="printSchedule()"]');
+
+            // Remove adviser-only info from profile
+            const adviserLabel = Array.from(document.querySelectorAll('#profile div')).find(
+                (el) => el.textContent.trim() === 'Adviser'
+            );
+            if (adviserLabel) adviserLabel.closest('div[style*="background"]')?.remove();
+
+            const classAdviserRow = Array.from(document.querySelectorAll('#profile .info-row')).find(
+                (el) => (el.querySelector('.info-label')?.textContent || '').includes('Class Adviser')
+            );
+            if (classAdviserRow) classAdviserRow.remove();
+
+            // Remove teacher labels from grade widgets
+            document.querySelectorAll('.grade-teacher').forEach((el) => el.remove());
+
+            // Remove teacher column in grades table
+            const gradesTable = document.querySelector('#grades table');
+            if (gradesTable) {
+                const teacherTh = Array.from(gradesTable.querySelectorAll('thead th')).findIndex(
+                    (th) => th.textContent.trim() === 'Teacher'
+                );
+                if (teacherTh >= 0) {
+                    gradesTable.querySelectorAll('tr').forEach((row) => {
+                        const cells = row.children;
+                        if (cells[teacherTh]) cells[teacherTh].remove();
+                    });
+                }
+            }
         }
 
         // Initialize the portal
         document.addEventListener('DOMContentLoaded', async function() {
             const currentUser = await enforcePortalAccess(['student']);
             if (!currentUser) return;
+            simplifyStudentPortal();
             clearStaticPortalContent();
 
             console.log('Student Portal initialized');
@@ -3036,9 +3114,6 @@
             // Start live updates
             setInterval(updateDateTime, 60000); // Update time every minute
             setInterval(checkForUpdates, 30000); // Check for updates every 30 seconds
-
-            // Initialize grade trends chart
-            initializeGradeChart();
 
             // Close modal buttons
             document.querySelectorAll('.modal-close').forEach(button => {
@@ -3594,7 +3669,6 @@
                 title: `${subject} Grade`,
                 html: `<div style="text-align: center">
                           <h2 style="color: #1a6633; font-size: 48px;">${grade}%</h2>
-                          <p>Teacher: ${teacher}</p>
                           <p>Last Updated: Today</p>
                           <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 10px;">
                               <p>This grade contributes to your overall ${subject} average.</p>
@@ -4291,8 +4365,62 @@
             }
             
             const studentInfo = document.getElementById('studentInfo');
+            const profileGradeTag = document.getElementById('profileGradeTag');
+            const profileInfoGradeLevel = document.getElementById('profileInfoGradeLevel');
+            const profileInfoSection = document.getElementById('profileInfoSection');
+            const studentProfileId = document.getElementById('studentProfileId');
+            const profileInfoBirthDate = document.getElementById('profileInfoBirthDate');
+            const profileInfoAddress = document.getElementById('profileInfoAddress');
+            const profileInfoGender = document.getElementById('profileInfoGender');
+            const profileInfoPhone = document.getElementById('profileInfoPhone');
+            const profileInfoEmergency = document.getElementById('profileInfoEmergency');
+            const profileAcademicYear = document.getElementById('profileAcademicYear');
             if (studentInfo) {
-                studentInfo.textContent = `Grade ${studentProfile?.gradeLevel || user.gradeLevel || '10'}`;
+                studentInfo.textContent = `Grade ${studentProfile?.gradeLevel || user.gradeLevel || '-'}`;
+            }
+
+            if (profileGradeTag) {
+                profileGradeTag.textContent = `Grade ${studentProfile?.gradeLevel || user.gradeLevel || '-'}`;
+            }
+
+            if (profileInfoGradeLevel) {
+                profileInfoGradeLevel.textContent = `Grade ${studentProfile?.gradeLevel || user.gradeLevel || '-'}`;
+            }
+
+            if (profileInfoSection) {
+                profileInfoSection.textContent = studentProfile?.section || '-';
+            }
+
+            if (studentProfileId) {
+                studentProfileId.textContent = studentProfile?.studentId || '-';
+            }
+
+            if (profileInfoBirthDate) {
+                profileInfoBirthDate.textContent = studentProfile?.birthDate
+                    ? new Date(studentProfile.birthDate).toLocaleDateString()
+                    : '-';
+            }
+
+            if (profileInfoAddress) {
+                profileInfoAddress.textContent = studentProfile?.address || '-';
+            }
+
+            if (profileInfoGender) {
+                profileInfoGender.textContent = '-';
+            }
+
+            if (profileInfoPhone) {
+                profileInfoPhone.textContent = studentProfile?.contactInfo || '-';
+            }
+
+            if (profileInfoEmergency) {
+                profileInfoEmergency.textContent = studentProfile?.guardianContact || studentProfile?.guardianName || '-';
+            }
+
+            if (profileAcademicYear) {
+                const now = new Date();
+                const year = now.getMonth() >= 5 ? now.getFullYear() : now.getFullYear() - 1;
+                profileAcademicYear.textContent = `${year}-${year + 1}`;
             }
 
         }
@@ -4306,6 +4434,8 @@
                 // Load grades
                 grades = await API.gradesMy.list() || [];
                 updateGradesDisplay();
+                updateGradesTableDisplay();
+                initializeGradeChart();
 
                 // Load attendance records (used for rate widget)
                 const attendanceRecords = await API.attendanceMy.list() || [];
@@ -4327,11 +4457,15 @@
                     id: a._id,
                     title: a.title,
                     subject: a.subject || '',
+                    description: a.description || '',
+                    points: a.points || a.maxScore || '',
                     due: a.dueDate ? new Date(a.dueDate).toLocaleDateString() : '',
+                    dueDateRaw: a.dueDate || null,
                     status: a.status || 'open'
                 }));
 
                 updateAssignmentsDisplay();
+                updateAssignmentsTableDisplay();
 
                 // Add due assignments to notifications (next 7 days)
                 const now = new Date();
@@ -4348,17 +4482,11 @@
                     type: 'deadline',
                     time: 'Upcoming'
                 })));
+                updateNotificationsDisplay();
 
-                // Load schedule
-                const schedule = await API.scheduleMy.list().catch(() => []);
-                if (schedule && schedule.length > 0) {
-                    updateScheduleDisplay(schedule.map(s => ({
-                        subject: s.subject,
-                        teacher: s.teacherName || '',
-                        room: s.room || '',
-                        time: s.time || ''
-                    })));
-                }
+                // Load learning resources metadata
+                resources = await API.uploads.list().catch(() => []);
+                updateResourcesDisplay();
 
                 // Update counts
                 updateDashboardCounts();
@@ -4374,10 +4502,14 @@
             grades = [];
             assignments = [];
             notifications = [];
+            resources = [];
             
             updateGradesDisplay();
+            updateGradesTableDisplay();
             updateAssignmentsDisplay();
+            updateAssignmentsTableDisplay();
             updateNotificationsDisplay();
+            updateResourcesDisplay();
             updateDashboardCounts();
         }
 
@@ -4420,9 +4552,8 @@
                 card.innerHTML = `
                     <div class="grade-value">${gradeValue}</div>
                     <div class="grade-subject">${grade.subject || ''}</div>
-                    <div class="grade-teacher">${grade.teacher || ''}</div>
                 `;
-                card.onclick = () => showGradeDetails(grade.subject || '', gradeValue, grade.teacher || '');
+                card.onclick = () => showGradeDetails(grade.subject || '', gradeValue, '');
                 gradesGrid.appendChild(card);
             });
             
@@ -4434,64 +4565,195 @@
                 document.getElementById('avgGradeValue').textContent = 'N/A';
             }
         }
+
+        function normalizeGradingPeriod(period) {
+            const value = String(period || '').toLowerCase();
+            if (value.includes('1')) return 'q1';
+            if (value.includes('2')) return 'q2';
+            if (value.includes('3')) return 'q3';
+            if (value.includes('4')) return 'q4';
+            return 'q1';
+        }
+
+        function toPercent(value) {
+            const num = Number(value);
+            if (!Number.isFinite(num)) return '-';
+            return `${Math.round(num)}%`;
+        }
+
+        function gradeStatus(value) {
+            const score = Number(value);
+            if (!Number.isFinite(score)) return '-';
+            if (score >= 90) return 'A';
+            if (score >= 85) return 'B+';
+            if (score >= 80) return 'B';
+            if (score >= 75) return 'C';
+            return 'Needs Improvement';
+        }
+
+        function formatAssignmentStatus(status) {
+            const normalized = String(status || 'open').toLowerCase();
+            if (normalized === 'completed' || normalized === 'submitted') return 'Submitted';
+            if (normalized === 'graded') return 'Graded';
+            if (normalized === 'closed') return 'Closed';
+            return 'Pending';
+        }
+
+        function updateGradesTableDisplay() {
+            const tbody = document.querySelector('#grades .table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const grouped = new Map();
+            (grades || []).forEach((grade) => {
+                const subject = grade.subject || 'Unknown Subject';
+                if (!grouped.has(subject)) {
+                    grouped.set(subject, { subject, q1: null, q2: null, q3: null, q4: null, latest: null });
+                }
+                const row = grouped.get(subject);
+                const period = normalizeGradingPeriod(grade.gradingPeriod);
+                row[period] = Number(grade.score ?? grade.grade ?? null);
+                row.latest = Number(grade.score ?? grade.grade ?? row.latest);
+            });
+
+            if (grouped.size === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">No grade records available yet.</td></tr>';
+                return;
+            }
+
+            grouped.forEach((entry) => {
+                const scores = [entry.q1, entry.q2, entry.q3, entry.q4].filter((v) => Number.isFinite(v));
+                const finalScore = scores.length
+                    ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+                    : (Number.isFinite(entry.latest) ? Math.round(entry.latest) : null);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${entry.subject}</strong></td>
+                    <td>${toPercent(entry.q1)}</td>
+                    <td>${toPercent(entry.q2)}</td>
+                    <td>${toPercent(entry.q3)}</td>
+                    <td>${toPercent(entry.q4)}</td>
+                    <td><strong style="color: var(--primary-green);">${toPercent(finalScore)}</strong></td>
+                    <td>${gradeStatus(finalScore)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
         
         // Update assignments display
         function updateAssignmentsDisplay() {
-            const assignmentsList = document.querySelector('.assignments-list');
-            if (!assignmentsList) return;
+            const assignmentLists = document.querySelectorAll('.assignments-list');
+            if (!assignmentLists.length) return;
             
             // Update pending count
             const pending = assignments.filter(a => a.status !== 'completed').length;
             document.getElementById('pendingCount').textContent = `${pending} pending assignments`;
-            
-            assignmentsList.innerHTML = '';
-            (assignments || []).slice(0, 6).forEach((assignment) => {
-                const item = document.createElement('div');
-                item.className = 'assignment-item';
-                if (assignment.status === 'completed') item.classList.add('completed');
-                if (assignment.status === 'urgent') item.classList.add('urgent');
-                if (assignment.status === 'upcoming') item.classList.add('upcoming');
 
-                item.innerHTML = `
-                    <div class="assignment-header">
-                        <div>
-                            <div class="assignment-title">${assignment.title || ''}</div>
-                            <div class="assignment-subject">${assignment.subject || ''}</div>
+            assignmentLists.forEach((assignmentsList) => {
+                assignmentsList.innerHTML = '';
+                (assignments || []).slice(0, 6).forEach((assignment) => {
+                    const item = document.createElement('div');
+                    item.className = 'assignment-item';
+                    if (assignment.status === 'completed') item.classList.add('completed');
+                    if (assignment.status === 'urgent') item.classList.add('urgent');
+                    if (assignment.status === 'upcoming') item.classList.add('upcoming');
+
+                    item.innerHTML = `
+                        <div class="assignment-header">
+                            <div>
+                                <div class="assignment-title">${assignment.title || ''}</div>
+                                <div class="assignment-subject">${assignment.subject || ''}</div>
+                            </div>
+                            <div class="assignment-due">Due ${assignment.due || 'N/A'}</div>
                         </div>
-                        <div class="assignment-due">Due ${assignment.due || 'N/A'}</div>
-                    </div>
-                `;
+                    `;
 
-                item.onclick = async () => {
-                    if (!assignment.id) return;
-                    Swal.fire({
-                        title: 'Submit Assignment',
-                        html: `<input type="file" id="assignmentFile" class="swal2-file" />`,
-                        showCancelButton: true,
-                        confirmButtonText: 'Submit',
-                        confirmButtonColor: '#1a6633'
-                    }).then(async (result) => {
-                        if (!result.isConfirmed) return;
-                        const fileInput = document.getElementById('assignmentFile');
-                        const file = fileInput && fileInput.files ? fileInput.files[0] : null;
-                        try {
-                            await API.assignmentsSubmit.submit(assignment.id, file || null);
-                            assignment.status = 'completed';
-                            updateAssignmentsDisplay();
-                            showToast('Assignment submitted', 'success');
-                        } catch (err) {
-                            showToast(err.message || 'Failed to submit assignment', 'error');
-                        }
-                    });
-                };
+                    item.onclick = async () => {
+                        if (!assignment.id) return;
+                        Swal.fire({
+                            title: 'Submit Assignment',
+                            html: `<input type="file" id="assignmentFile" class="swal2-file" />`,
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit',
+                            confirmButtonColor: '#1a6633'
+                        }).then(async (result) => {
+                            if (!result.isConfirmed) return;
+                            const fileInput = document.getElementById('assignmentFile');
+                            const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+                            try {
+                                await API.assignmentsSubmit.submit(assignment.id, file || null);
+                                assignment.status = 'completed';
+                                updateAssignmentsDisplay();
+                                updateAssignmentsTableDisplay();
+                                showToast('Assignment submitted', 'success');
+                            } catch (err) {
+                                showToast(err.message || 'Failed to submit assignment', 'error');
+                            }
+                        });
+                    };
 
-                assignmentsList.appendChild(item);
+                    assignmentsList.appendChild(item);
+                });
             });
 
             const viewHistoryBtn = document.getElementById('viewAssignmentHistoryBtn');
             if (viewHistoryBtn) {
                 viewHistoryBtn.onclick = () => showAssignmentHistory();
             }
+        }
+
+        function updateAssignmentsTableDisplay() {
+            const tbody = document.querySelector('#assignments .table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (!assignments.length) {
+                tbody.innerHTML = '<tr><td colspan="6">No assignments available.</td></tr>';
+                return;
+            }
+
+            (assignments || []).forEach((assignment) => {
+                const tr = document.createElement('tr');
+                const points = assignment.points || '-';
+                tr.innerHTML = `
+                    <td><strong>${assignment.title || ''}</strong><br><small>${assignment.description || ''}</small></td>
+                    <td>${assignment.subject || '-'}</td>
+                    <td>${assignment.due || '-'}</td>
+                    <td>${formatAssignmentStatus(assignment.status)}</td>
+                    <td>${points}</td>
+                    <td>
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 12px;" data-submit-assignment="${assignment.id || ''}">
+                            <i class="bi bi-upload"></i> Submit
+                        </button>
+                    </td>
+                `;
+                const submitBtn = tr.querySelector('[data-submit-assignment]');
+                if (submitBtn && assignment.id) {
+                    submitBtn.addEventListener('click', async () => {
+                        Swal.fire({
+                            title: 'Submit Assignment',
+                            html: `<input type="file" id="assignmentFile" class="swal2-file" />`,
+                            showCancelButton: true,
+                            confirmButtonText: 'Submit',
+                            confirmButtonColor: '#1a6633'
+                        }).then(async (result) => {
+                            if (!result.isConfirmed) return;
+                            const fileInput = document.getElementById('assignmentFile');
+                            const file = fileInput && fileInput.files ? fileInput.files[0] : null;
+                            try {
+                                await API.assignmentsSubmit.submit(assignment.id, file || null);
+                                assignment.status = 'completed';
+                                updateAssignmentsDisplay();
+                                updateAssignmentsTableDisplay();
+                                showToast('Assignment submitted', 'success');
+                            } catch (err) {
+                                showToast(err.message || 'Failed to submit assignment', 'error');
+                            }
+                        });
+                    });
+                }
+                tbody.appendChild(tr);
+            });
         }
 
         async function showAssignmentHistory() {
@@ -4571,6 +4833,82 @@
                     notificationsList.appendChild(item);
                 });
             }
+        }
+
+        function formatFileSize(bytes) {
+            const value = Number(bytes);
+            if (!Number.isFinite(value) || value <= 0) return '-';
+            if (value < 1024) return `${value} B`;
+            if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+            return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function formatResourceType(mimeType) {
+            if (!mimeType) return 'FILE';
+            if (mimeType.includes('pdf')) return 'PDF';
+            if (mimeType.includes('word')) return 'DOC';
+            if (mimeType.includes('image')) return 'IMAGE';
+            if (mimeType.includes('csv')) return 'CSV';
+            if (mimeType.includes('text')) return 'TEXT';
+            return 'FILE';
+        }
+
+        function updateResourcesDisplay() {
+            const allGrids = document.querySelectorAll('.resources-grid');
+            const topResources = (resources || []).slice(0, 6);
+
+            allGrids.forEach((grid, index) => {
+                grid.innerHTML = '';
+                const start = index * 3;
+                const chunk = topResources.slice(start, start + 3);
+                chunk.forEach((resource) => {
+                    const item = document.createElement('div');
+                    item.className = 'resource-item';
+                    item.innerHTML = `
+                        <div class="resource-icon"><i class="bi bi-file-earmark-text"></i></div>
+                        <div class="resource-title">${resource.originalName || resource.filename || 'Untitled'}</div>
+                        <div class="resource-size">${formatResourceType(resource.mimeType)} • ${formatFileSize(resource.size)}</div>
+                    `;
+                    item.onclick = () => {
+                        if (resource._id) {
+                            window.open(API.uploads.downloadUrl(resource._id), '_blank');
+                        }
+                    };
+                    grid.appendChild(item);
+                });
+            });
+
+            const tbody = document.querySelector('#resourcesTable tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!resources.length) {
+                tbody.innerHTML = '<tr><td colspan="6">No backend resources available.</td></tr>';
+                return;
+            }
+
+            (resources || []).forEach((resource) => {
+                const tr = document.createElement('tr');
+                const uploadedDate = resource.createdAt ? new Date(resource.createdAt).toLocaleDateString() : '-';
+                tr.innerHTML = `
+                    <td><strong>${resource.originalName || resource.filename || 'Untitled'}</strong></td>
+                    <td>-</td>
+                    <td>${formatResourceType(resource.mimeType)}</td>
+                    <td>${formatFileSize(resource.size)}</td>
+                    <td>${uploadedDate}</td>
+                    <td>
+                        <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" data-download-resource="${resource._id || ''}">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                    </td>
+                `;
+                const downloadBtn = tr.querySelector('[data-download-resource]');
+                if (downloadBtn && resource._id) {
+                    downloadBtn.addEventListener('click', () => {
+                        window.open(API.uploads.downloadUrl(resource._id), '_blank');
+                    });
+                }
+                tbody.appendChild(tr);
+            });
         }
         
         // Update schedule display
@@ -4658,37 +4996,49 @@
         function initializeGradeChart() {
             const ctx = document.getElementById('gradeTrendsChart');
             if (!ctx) return;
-            
-            new Chart(ctx, {
+
+            const labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+            const grouped = new Map();
+            (grades || []).forEach((grade) => {
+                const subject = grade.subject || 'General';
+                const period = normalizeGradingPeriod(grade.gradingPeriod);
+                if (!grouped.has(subject)) {
+                    grouped.set(subject, { q1: null, q2: null, q3: null, q4: null });
+                }
+                const row = grouped.get(subject);
+                row[period] = Number(grade.score ?? grade.grade ?? null);
+            });
+
+            const palette = ['#1a6633', '#2d8b4a', '#ffd700', '#17a2b8', '#dc3545'];
+            const datasets = Array.from(grouped.entries()).slice(0, 4).map(([subject, values], index) => ({
+                label: subject,
+                data: [values.q1, values.q2, values.q3, values.q4].map((v) => Number.isFinite(v) ? v : null),
+                borderColor: palette[index % palette.length],
+                backgroundColor: 'rgba(26, 102, 51, 0.1)',
+                borderWidth: 2,
+                tension: 0.35
+            }));
+
+            if (!datasets.length) {
+                datasets.push({
+                    label: 'No grade data yet',
+                    data: [null, null, null, null],
+                    borderColor: '#1a6633',
+                    backgroundColor: 'rgba(26, 102, 51, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.35
+                });
+            }
+
+            if (gradeTrendChart) {
+                gradeTrendChart.destroy();
+            }
+
+            gradeTrendChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar'],
-                    datasets: [
-                        {
-                            label: 'Mathematics',
-                            data: [88, 90, 92, 91, 93, 94, 93, 94],
-                            borderColor: '#1a6633',
-                            backgroundColor: 'rgba(26, 102, 51, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Science',
-                            data: [85, 86, 87, 88, 87, 88, 88, 88],
-                            borderColor: '#2d8b4a',
-                            backgroundColor: 'rgba(45, 139, 74, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'English',
-                            data: [89, 90, 90, 91, 91, 91, 91, 91],
-                            borderColor: '#ffd700',
-                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        }
-                    ]
+                    labels,
+                    datasets
                 },
                 options: {
                     responsive: true,
@@ -4700,7 +5050,7 @@
                     scales: {
                         y: {
                             beginAtZero: false,
-                            min: 70,
+                            min: 60,
                             max: 100,
                             title: {
                                 display: true,

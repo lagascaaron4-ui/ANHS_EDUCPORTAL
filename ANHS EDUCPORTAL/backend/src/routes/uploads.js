@@ -67,7 +67,7 @@ router.post('/', protect, requireRole('admin', 'staff', 'teacher'), upload.singl
   }
 });
 
-router.get('/', protect, requireRole('admin', 'staff', 'teacher'), async (req, res, next) => {
+router.get('/', protect, requireRole('admin', 'staff', 'teacher', 'student', 'parent'), async (req, res, next) => {
   try {
     const docs = await Upload.find().sort({ createdAt: -1 });
     res.json(docs);

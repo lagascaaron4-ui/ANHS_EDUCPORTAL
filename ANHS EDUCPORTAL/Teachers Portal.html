@@ -1032,10 +1032,10 @@
         </div>
 
         <div class="teacher-profile">
-            <div class="teacher-avatar">JS</div>
+            <div class="teacher-avatar" id="teacherAvatar">T</div>
             <div class="teacher-info">
-                <h4>Jane Smith</h4>
-                <p>Senior Teacher</p>
+                <h4 id="teacherDisplayName">Teacher</h4>
+                <p id="teacherRoleLabel">Staff</p>
             </div>
         </div>
 
@@ -1052,7 +1052,7 @@
         <section id="dashboard" class="active">
             <div class="dashboard-header">
                 <div class="header-left">
-                    <h1><i class="ri-dashboard-line"></i> Welcome back, Jane!</h1>
+                    <h1 id="teacherWelcomeTitle"><i class="ri-dashboard-line"></i> Welcome back</h1>
                     <p>Here's what's happening with your classes today</p>
                 </div>
                 <div class="header-right">
@@ -1960,11 +1960,32 @@
             });
         }
 
+        function applyTeacherIdentity(user) {
+            const fullName = user?.name || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Teacher';
+            const initials = fullName
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part.charAt(0).toUpperCase())
+                .join('') || 'T';
+
+            const avatar = document.getElementById('teacherAvatar');
+            const nameLabel = document.getElementById('teacherDisplayName');
+            const roleLabel = document.getElementById('teacherRoleLabel');
+            const welcomeTitle = document.getElementById('teacherWelcomeTitle');
+
+            if (avatar) avatar.textContent = initials;
+            if (nameLabel) nameLabel.textContent = fullName;
+            if (roleLabel) roleLabel.textContent = (user?.role || 'teacher').toUpperCase();
+            if (welcomeTitle) welcomeTitle.innerHTML = `<i class="ri-dashboard-line"></i> Welcome back, ${escapeHtml(fullName)}!`;
+        }
+
         // Initialize the portal
         document.addEventListener('DOMContentLoaded', async function() {
             const currentUser = await enforcePortalAccess(['teacher', 'staff', 'admin']);
             if (!currentUser) return;
             clearStaticPortalContent();
+            applyTeacherIdentity(currentUser);
 
             // Initialize all functionality
             initSidebar();
@@ -2046,9 +2067,7 @@
             if (mainPortalBtn) {
                 mainPortalBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    alert('Redirecting to main portal...');
-                    // In a real application, this would redirect to the main portal
-                    // window.location.href = '/main-portal';
+                    window.location.href = 'main.html';
                 });
             }
         }

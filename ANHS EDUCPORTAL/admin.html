@@ -579,7 +579,7 @@
                 <i class="bi bi-speedometer2"></i>
                 <div>
                     <h1 style="margin: 0; color: var(--primary-color);">Dashboard Overview</h1>
-                    <small style="color: #666;">Welcome back, Admin!</small>
+                    <small id="adminWelcomeText" style="color: #666;">Welcome back</small>
                 </div>
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
@@ -764,7 +764,7 @@
                     <i class="bi bi-search"></i>
                     <input type="text" id="studentSearch" placeholder="Search students by name, ID, or grade...">
                 </div>
-                <select class="form-control" style="width: 200px;">
+                <select id="studentGradeFilter" class="form-control" style="width: 200px;">
                     <option>All Grades</option>
                     <option>Grade 7</option>
                     <option>Grade 8</option>
@@ -785,47 +785,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>STU-2024-001</td>
-                            <td>Juan Dela Cruz</td>
-                            <td>Grade 10</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="View">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn-icon" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn-icon" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>STU-2024-002</td>
-                            <td>Maria Santos</td>
-                            <td>Grade 9</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon" title="View">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn-icon" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn-icon" title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                    </tbody>
+                    <tbody id="studentsTableBody"></tbody>
                 </table>
             </div>
         </section>
@@ -1336,6 +1296,7 @@
 
         function clearStaticPortalContent() {
             const clearTargets = [
+                'studentsTableBody',
                 'assignmentsTableBody',
                 'scheduleTableBody',
                 'submissionsList',
@@ -1359,12 +1320,73 @@
         }
 
         const adminRoleState = {
+            students: [],
             teachers: [],
             users: [],
             invites: [],
             canViewUsers: false,
             canViewInvites: false
         };
+
+        function renderStudentsTable(searchTerm = '', gradeFilter = 'All Grades') {
+            const tbody = document.getElementById('studentsTableBody');
+            if (!tbody) return;
+
+            const query = String(searchTerm || '').trim().toLowerCase();
+            const gradeQuery = String(gradeFilter || 'All Grades').toLowerCase();
+            const rows = (adminRoleState.students || [])
+                .filter((student) => {
+                    const studentId = String(student.studentId || '');
+                    const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim();
+                    const grade = `Grade ${student.gradeLevel || ''}`.trim();
+                    const searchable = `${studentId} ${fullName} ${grade}`.toLowerCase();
+                    const matchQuery = !query || searchable.includes(query);
+                    const matchGrade = gradeQuery === 'all grades' || grade.toLowerCase() === gradeQuery;
+                    return matchQuery && matchGrade;
+                })
+                .map((student) => {
+                    const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim() || 'Unnamed Student';
+                    const grade = `Grade ${student.gradeLevel || '-'}`;
+                    const status = student.status || 'active';
+                    return `
+                        <tr>
+                            <td>${escapeHtml(student.studentId || '-')}</td>
+                            <td>${escapeHtml(fullName)}</td>
+                            <td>${escapeHtml(grade)}</td>
+                            <td><span class="status-badge ${statusBadgeClass(status)}">${escapeHtml(formatRoleLabel(status))}</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" title="View" data-view-student="${escapeHtml(student._id || '')}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="5">No students found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.join('');
+        }
+
+        async function loadAdminStudents() {
+            try {
+                const students = await API.students.list();
+                adminRoleState.students = Array.isArray(students) ? students : [];
+                const searchInput = document.getElementById('studentSearch');
+                const gradeFilter = document.getElementById('studentGradeFilter');
+                renderStudentsTable(
+                    searchInput ? searchInput.value : '',
+                    gradeFilter ? gradeFilter.value : 'All Grades'
+                );
+            } catch (err) {
+                const tbody = document.getElementById('studentsTableBody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="5">Failed to load students from backend.</td></tr>';
+            }
+        }
 
         function statusBadgeClass(status) {
             const normalized = String(status || '').toLowerCase();
@@ -1590,6 +1612,10 @@
             const currentUser = await enforcePortalAccess(['admin', 'staff']);
             if (!currentUser) return;
             clearStaticPortalContent();
+            const welcome = document.getElementById('adminWelcomeText');
+            if (welcome) {
+                welcome.textContent = `Welcome back, ${currentUser.name || 'User'}!`;
+            }
 
             console.log("Admin Panel Loaded Successfully");
 
@@ -1821,6 +1847,7 @@
                         showToast('Student added successfully!', 'success');
                         closeModal('studentModal');
                         studentForm.reset();
+                        loadAdminStudents();
                         loadAdminStats();
                     } catch (err) {
                         showToast(err.message || 'Failed to add student', 'danger');
@@ -2170,10 +2197,24 @@
             }
 
             await loadRoleDirectory();
+            loadAdminStudents();
             loadAdminStats();
             loadAssignmentsAdmin();
             loadScheduleAdmin();
             loadEnrollmentChart();
+
+            const studentSearch = document.getElementById('studentSearch');
+            const studentGradeFilter = document.getElementById('studentGradeFilter');
+            if (studentSearch) {
+                studentSearch.addEventListener('input', () => {
+                    renderStudentsTable(studentSearch.value, studentGradeFilter ? studentGradeFilter.value : 'All Grades');
+                });
+            }
+            if (studentGradeFilter) {
+                studentGradeFilter.addEventListener('change', () => {
+                    renderStudentsTable(studentSearch ? studentSearch.value : '', studentGradeFilter.value);
+                });
+            }
 
             // Close modals when clicking outside
             document.querySelectorAll('.modal-overlay').forEach(modal => {
