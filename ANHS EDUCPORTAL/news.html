@@ -1643,7 +1643,7 @@
                 <p>Important notices and updates from the school administration</p>
             </div>
             
-            <div class="announcements-list">
+            <div class="announcements-list" id="announcementsList">
                 <div class="announcement-item" data-aos="fade-right">
                     <h3>Enrollment for School Year 2024-2025 Now Open</h3>
                     <p>Online and in-person enrollment for all grade levels starts April 1, 2024. Please check the admissions page for complete requirements and schedule. Early enrollment is encouraged to secure slots.</p>
@@ -1850,6 +1850,51 @@
     </a>
 
     <script>
+        const NEWS_PRODUCTION_API_URL = 'https://anhs-educportal.onrender.com';
+        const NEWS_HOSTNAME = window.location.hostname;
+        const NEWS_IS_FILE_PROTOCOL = window.location.protocol === 'file:';
+        const NEWS_IS_LOOPBACK = ['localhost', '127.0.0.1', '::1'].includes(NEWS_HOSTNAME);
+        const NEWS_IS_PRIVATE_IPV4 = /^(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})$/.test(NEWS_HOSTNAME);
+        const NEWS_IS_LOCAL_NETWORK_HOST = NEWS_IS_FILE_PROTOCOL || NEWS_IS_LOOPBACK || NEWS_IS_PRIVATE_IPV4 || NEWS_HOSTNAME.endsWith('.local');
+        const NEWS_LOCAL_API_URL = NEWS_IS_FILE_PROTOCOL
+            ? 'http://localhost:10000'
+            : `http://${NEWS_HOSTNAME || 'localhost'}:10000`;
+        const NEWS_API_BASE_URL = window.ANHS_API_BASE_URL
+            || (NEWS_IS_LOCAL_NETWORK_HOST ? NEWS_LOCAL_API_URL : '')
+            || NEWS_PRODUCTION_API_URL
+            || '';
+
+        async function publicApiFetch(endpoint) {
+            if (!NEWS_API_BASE_URL) throw new Error('API base URL is not configured');
+            const response = await fetch(`${NEWS_API_BASE_URL}${endpoint}`, { credentials: 'include' });
+            const data = await response.json().catch(() => null);
+            if (!response.ok) throw new Error(data?.message || `Request failed: ${response.status}`);
+            return data;
+        }
+
+        async function loadOfficialAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            if (!container) return;
+
+            try {
+                const rows = await publicApiFetch('/api/announcements');
+                if (!Array.isArray(rows) || rows.length === 0) return; // keep static fallback
+
+                container.innerHTML = rows.slice(0, 6).map((item, index) => `
+                    <div class="announcement-item" data-aos="fade-right" ${index > 0 ? `data-aos-delay="${index * 100}"` : ''}>
+                        <h3>${(item.title || 'Announcement').replace(/</g, '&lt;')}</h3>
+                        <p>${(item.content || 'No details available.').replace(/</g, '&lt;')}</p>
+                        <div class="announcement-date">
+                            <i class="bi bi-calendar-check"></i>
+                            Posted: ${new Date(item.createdAt || Date.now()).toLocaleDateString()}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.warn('Failed to load official announcements:', error);
+            }
+        }
+
         // Initialize AOS animations
         AOS.init({
             duration: 1000,
@@ -2179,6 +2224,7 @@
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('ANHS News Page loaded');
+            await loadOfficialAnnouncements();
             await loadCalendarEvents();
             // Generate calendar with current month
             generateCalendar();

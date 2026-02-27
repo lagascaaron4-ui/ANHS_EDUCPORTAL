@@ -127,13 +127,40 @@ async function loadPrograms() {
 // Load news from API
 async function loadNews() {
     try {
-        const data = await apiFetch('/api/news');
-        
+        const [newsRows, announcementRows] = await Promise.all([
+            apiFetch('/api/news').catch(() => []),
+            apiFetch('/api/announcements').catch(() => [])
+        ]);
+
         const container = document.getElementById('news-container');
         if (!container) return;
-        
-        if (Array.isArray(data) && data.length > 0) {
-            container.innerHTML = data.slice(0, 3).map((news, index) => `
+
+        const newsItems = Array.isArray(newsRows) ? newsRows.map((item) => ({
+            title: item.title,
+            summary: item.summary,
+            content: item.content,
+            image: item.image,
+            category: item.category || 'News',
+            createdAt: item.createdAt || item.date,
+            views: item.views || 0
+        })) : [];
+
+        const announcementItems = Array.isArray(announcementRows) ? announcementRows.map((item) => ({
+            title: item.title,
+            summary: '',
+            content: item.content,
+            image: '',
+            category: 'Announcement',
+            createdAt: item.createdAt,
+            views: 0
+        })) : [];
+
+        const combined = newsItems
+            .concat(announcementItems)
+            .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+        if (combined.length > 0) {
+            container.innerHTML = combined.slice(0, 3).map((news, index) => `
                 <div class="news-card" data-aos="fade-up" data-aos-delay="${(index + 1) * 100}">
                     <div class="news-image">
                         <img src="${news.image || 'https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80'}" alt="${news.title}">
@@ -150,13 +177,13 @@ async function loadNews() {
                 </div>
             `).join('');
         } else {
-            container.innerHTML = '<p class="text-center">No news available at the moment.</p>';
+            container.innerHTML = '<p class="text-center">No news or announcements available at the moment.</p>';
         }
     } catch (error) {
-        console.error('Failed to load news:', error);
+        console.error('Failed to load news/announcements:', error);
         const container = document.getElementById('news-container');
         if (container) {
-            container.innerHTML = '<p class="text-center text-danger">Failed to load news. Please try again later.</p>';
+            container.innerHTML = '<p class="text-center text-danger">Failed to load updates. Please try again later.</p>';
         }
     }
 }
