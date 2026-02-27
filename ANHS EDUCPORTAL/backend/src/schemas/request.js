@@ -28,7 +28,8 @@ const registerSchema = z.object({
   contactInfo: optionalString,
   address: optionalString,
   guardianName: optionalString,
-  guardianContact: optionalString
+  guardianContact: optionalString,
+  parentEmail: z.string().trim().email().optional()
 });
 
 const loginSchema = z.object({
@@ -72,6 +73,7 @@ const studentBase = z.object({
   contactInfo: optionalString,
   address: optionalString,
   guardianName: optionalString,
+  parentEmail: z.string().trim().email().optional(),
   guardianContact: optionalString,
   status: z.enum(['active', 'inactive']).optional()
 });
@@ -236,6 +238,7 @@ const studentSelfUpdate = withAtLeastOneField(z.object({
   address: optionalString,
   guardianName: optionalString,
   guardianContact: optionalString,
+  parentEmail: z.string().trim().email().optional(),
   email: z.string().trim().email().optional(),
   name: optionalString
 }).partial());

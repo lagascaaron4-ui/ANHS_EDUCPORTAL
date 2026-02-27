@@ -1539,7 +1539,7 @@
                     S
                 </div>
                 <div class="student-info">
-                    <h3 id="studentName">Juan Dela Cruz</h3>
+                    <h3 id="studentName">Student</h3>
                     <p id="studentInfo">Grade 10</p>
 
                 </div>
@@ -2787,7 +2787,7 @@
                         <div class="profile-avatar-large" id="profileAvatarLarge">
                             S
                         </div>
-                        <h3 id="profileFullName">Juan Dela Cruz</h3>
+                        <h3 id="profileFullName">Student</h3>
                         <p style="color: var(--dark-gray); margin-bottom: 20px;">Grade 10</p>
 
                         
@@ -2814,7 +2814,7 @@
                             </h4>
                             <div class="info-row">
                                 <span class="info-label">Full Name:</span>
-                                <span class="info-value" id="profileInfoFullName">Juan Dela Cruz</span>
+                                <span class="info-value" id="profileInfoFullName">Student</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Date of Birth:</span>
@@ -2837,6 +2837,10 @@
                             <div class="info-row">
                                 <span class="info-label">Email:</span>
                                 <span class="info-value" id="profileInfoEmail">juan.delacruz@anhs.edu.ph</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Parent Email:</span>
+                                <span class="info-value" id="profileInfoParentEmail">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Phone:</span>
@@ -3065,12 +3069,14 @@
             const first = current?.firstName || '';
             const last = current?.lastName || '';
             const email = (API.getCurrentUser && API.getCurrentUser()?.email) || '';
+            const parentEmail = current?.parentEmail || '';
 
             Swal.fire({
                 title: 'Edit Profile',
                 html: `<input type="text" id="firstName" class="swal2-input" placeholder="First Name" value="${first}">
                        <input type="text" id="lastName" class="swal2-input" placeholder="Last Name" value="${last}">
-                       <input type="email" id="email" class="swal2-input" placeholder="Email" value="${email}">`,
+                       <input type="email" id="email" class="swal2-input" placeholder="Email" value="${email}">
+                       <input type="email" id="parentEmail" class="swal2-input" placeholder="Parent Email" value="${parentEmail}">`,
                 showCancelButton: true,
                 confirmButtonText: 'Save',
                 confirmButtonColor: '#1a6633'
@@ -3079,17 +3085,23 @@
                     const updatedFirst = document.getElementById('firstName').value.trim();
                     const updatedLast = document.getElementById('lastName').value.trim();
                     const updatedEmail = document.getElementById('email').value.trim();
+                    const updatedParentEmail = document.getElementById('parentEmail').value.trim();
 
                     try {
                         await API.studentsMe.update({
                             firstName: updatedFirst,
                             lastName: updatedLast,
                             email: updatedEmail,
-                            name: `${updatedFirst} ${updatedLast}`.trim()
+                            name: `${updatedFirst} ${updatedLast}`.trim(),
+                            parentEmail: updatedParentEmail || undefined
                         });
                         const profileFullName = document.getElementById('profileFullName');
                         if (profileFullName) {
                             profileFullName.textContent = `${updatedFirst} ${updatedLast}`.trim();
+                        }
+                        const profileInfoParentEmail = document.getElementById('profileInfoParentEmail');
+                        if (profileInfoParentEmail) {
+                            profileInfoParentEmail.textContent = updatedParentEmail || '-';
                         }
                         showToast('Profile updated successfully', 'success');
                     } catch (err) {
@@ -4185,12 +4197,13 @@
                     showSessionExpired();
                     return;
                 }
+                const studentProfile = await API.studentsMe.get().catch(() => null);
 
                 // Update student info
-                updateStudentInfo(user);
+                updateStudentInfo(user, studentProfile);
 
                 // Load data from API
-                await loadDataFromAPI(user);
+                await loadDataFromAPI(user, studentProfile);
 
             } catch (error) {
                 console.error('Failed to load student data:', error);
@@ -4225,7 +4238,7 @@
         }
         
         // Update student information
-        function updateStudentInfo(user) {
+        function updateStudentInfo(user, studentProfile = null) {
             const studentName = document.getElementById('studentName');
             const welcomeName = document.getElementById('welcomeName');
             const studentAvatar = document.getElementById('studentAvatar');
@@ -4268,18 +4281,27 @@
             if (profileInfoEmail) {
                 profileInfoEmail.textContent = user.email || '-';
             }
+
+            const profileInfoParentEmail = document.getElementById('profileInfoParentEmail');
+            if (profileInfoParentEmail) {
+                const parentEmail = studentProfile?.parentEmail
+                    || (String(studentProfile?.guardianContact || '').includes('@') ? studentProfile.guardianContact : '')
+                    || '-';
+                profileInfoParentEmail.textContent = parentEmail;
+            }
             
             const studentInfo = document.getElementById('studentInfo');
             if (studentInfo) {
-                studentInfo.textContent = `Grade ${user.gradeLevel || '10'}`;
+                studentInfo.textContent = `Grade ${studentProfile?.gradeLevel || user.gradeLevel || '10'}`;
             }
 
         }
         
         // Load data from API
-        async function loadDataFromAPI(user) {
+        async function loadDataFromAPI(user, currentProfile = null) {
             try {
-                const studentProfile = await API.studentsMe.get().catch(() => null);
+                const studentProfile = currentProfile || await API.studentsMe.get().catch(() => null);
+                updateStudentInfo(user, studentProfile);
 
                 // Load grades
                 grades = await API.gradesMy.list() || [];

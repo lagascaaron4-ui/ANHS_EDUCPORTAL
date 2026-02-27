@@ -113,6 +113,7 @@ async function register(req, res, next) {
       address,
       guardianName,
       guardianContact,
+      parentEmail,
       staffId,
       department,
       subjects,
@@ -153,6 +154,8 @@ async function register(req, res, next) {
     const parsedLast = lastName || (name ? name.split(' ').slice(1).join(' ') : '');
     const normalizedStaffId = (staffId || '').trim();
     const normalizedDepartment = (department || '').trim();
+    const normalizedParentEmail = String(parentEmail || '').trim().toLowerCase()
+      || (String(guardianContact || '').includes('@') ? String(guardianContact || '').trim().toLowerCase() : '');
 
     const createProfiles = async (user, session = null) => {
       const options = session ? { session } : undefined;
@@ -168,7 +171,8 @@ async function register(req, res, next) {
           contactInfo: contactInfo || normalizedEmail,
           address,
           guardianName,
-          guardianContact
+          guardianContact,
+          parentEmail: normalizedParentEmail || undefined
         };
         if (session) await Student.create([studentDoc], options);
         else await Student.create(studentDoc);

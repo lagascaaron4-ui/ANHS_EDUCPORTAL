@@ -25,6 +25,42 @@ class APIClient {
         this.csrfToken = null;
         this.user = null;
         this._sessionPromise = null;
+        this.authStorageKey = 'anhs_auth_v1';
+        this._hydrateAuth();
+    }
+
+    _hydrateAuth() {
+        try {
+            const raw = sessionStorage.getItem(this.authStorageKey) || localStorage.getItem(this.authStorageKey);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.token && parsed.user) {
+                this.token = parsed.token;
+                this.user = parsed.user;
+                this.csrfToken = parsed.csrfToken || null;
+            }
+        } catch (error) {
+            console.warn('Failed to restore auth session:', error);
+        }
+    }
+
+    _persistAuth() {
+        try {
+            if (!this.token || !this.user) {
+                sessionStorage.removeItem(this.authStorageKey);
+                localStorage.removeItem(this.authStorageKey);
+                return;
+            }
+
+            const payload = JSON.stringify({
+                token: this.token,
+                user: this.user,
+                csrfToken: this.csrfToken || null
+            });
+            sessionStorage.setItem(this.authStorageKey, payload);
+        } catch (error) {
+            console.warn('Failed to persist auth session:', error);
+        }
     }
 
     sanitizePayload(value) {
@@ -354,6 +390,7 @@ class APIClient {
         this.token = token;
         this.user = user;
         if (csrfToken) this.csrfToken = csrfToken;
+        this._persistAuth();
     }
 
     clearAuth() {
@@ -361,6 +398,7 @@ class APIClient {
         this.csrfToken = null;
         this.user = null;
         this._sessionPromise = null;
+        this._persistAuth();
     }
 
     isAuthenticated() {
@@ -384,19 +422,32 @@ class APIClient {
         if (!force && this._sessionPromise) return this._sessionPromise;
 
         this._sessionPromise = (async () => {
-            const response = await fetch(`${this.baseURL}/api/auth/me`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            const data = await response.json().catch(() => null);
+            const headers = {};
+            if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
+
+            let response = null;
+            let data = null;
+            try {
+                response = await fetch(`${this.baseURL}/api/auth/me`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers
+                });
+                data = await response.json().catch(() => null);
+            } catch (networkError) {
+                if (this.user && this.token) return this.user;
+                throw networkError;
+            }
 
             if (!response.ok || !data?.user) {
+                if (this.user && this.token) return this.user;
                 this.clearAuth();
                 throw new Error('Session expired. Please login again.');
             }
 
             this.user = data.user;
             if (data.csrfToken) this.csrfToken = data.csrfToken;
+            this._persistAuth();
             return this.user;
         })();
 

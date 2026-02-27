@@ -23,7 +23,7 @@ router.put('/me', protect, requireRole('student'), async (req, res, next) => {
     const student = await Student.findOne({ user: req.user._id });
     if (!student) return res.status(404).json({ message: 'Student profile not found' });
 
-    const allowed = ['firstName', 'lastName', 'birthDate', 'contactInfo', 'address', 'guardianName', 'guardianContact'];
+    const allowed = ['firstName', 'lastName', 'birthDate', 'contactInfo', 'address', 'guardianName', 'guardianContact', 'parentEmail'];
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) student[field] = req.body[field];
     });

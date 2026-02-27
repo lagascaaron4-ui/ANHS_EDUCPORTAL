@@ -12,6 +12,11 @@ router.post('/', async (req, res, next) => {
     const doc = await Admission.create(req.body);
     res.status(201).json({
       _id: doc._id,
+      studentName: doc.studentName,
+      gradeLevel: doc.gradeLevel,
+      guardianName: doc.guardianName,
+      contactInfo: doc.contactInfo,
+      previousSchool: doc.previousSchool,
       referenceNumber: doc.referenceNumber,
       status: doc.status,
       submittedAt: doc.submittedAt

@@ -13,6 +13,7 @@ const studentSchema = new mongoose.Schema(
     address: { type: String },
     guardianName: { type: String },
     guardianContact: { type: String },
+    parentEmail: { type: String, lowercase: true, trim: true },
     parents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Parent' }],
     status: { type: String, enum: ['active', 'inactive'], default: 'active' }
   },
